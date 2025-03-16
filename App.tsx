@@ -5,73 +5,33 @@
  * @format
  */
 
-import React from 'react';
-import type { PropsWithChildren } from 'react';
+import React, { useState } from 'react';
 import {
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
-  useColorScheme,
   Alert,
   View,
   Pressable
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
 import { getScreenSize } from './utils/dimension';
-import { generateGrid } from './utils/array';
-
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({ children, title }: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+import { generateGrid, GridCell } from './utils/array';
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
 
   const { width, height } = getScreenSize();
   const safePadding = 3;
-  const grid = generateGrid(width, height, safePadding, 4);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const [grid, setGrid] = useState<GridCell[]>(generateGrid(width, height, safePadding, 4));
 
-  const handleCellPress = (index: number) => {
-    grid[index].pressed = true;
+  const handleCellPress = (cell: GridCell, index: number) => {
+    setGrid(prevGrid =>
+      prevGrid.map((cell, i) =>
+        i === index ? { ...cell, pressed: true, text: cell.isBomb ? '💣' : cell.bombsAround.toString() } : cell
+      )
+    );
+
+    if (grid[index].isBomb) Alert.alert('You lost');
   };
 
 
@@ -90,7 +50,7 @@ function App(): React.JSX.Element {
       {grid.map((cell, index) => (
         <Pressable
           key={index}
-          onPress={() => handleCellPress(index)}
+          onPress={() => handleCellPress(cell, index)}
           style={() => [
             styles.cell,
             {
@@ -98,11 +58,11 @@ function App(): React.JSX.Element {
               top: cell.y,
               width: cell.width,
               height: cell.height,
-              backgroundColor: cell.pressed ? 'lightgray' : 'white', // Visual feedback on press
+              backgroundColor: cell.pressed ? 'white' : 'lightgray', // Visual feedback on press
             },
           ]}
         >
-          {cell.isBomb ? <Text>Bomb</Text> : <Text>{cell.bombsAround}</Text>}
+          <Text>{cell.pressed ? cell.text : ''}</Text>
         </Pressable>
       ))
       }

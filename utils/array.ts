@@ -1,4 +1,4 @@
-type GridCell = {
+export type GridCell = {
     x: number;
     y: number;
     width: number;
@@ -6,6 +6,7 @@ type GridCell = {
     isBomb: boolean;
     bombsAround: number;
     pressed: boolean;
+    text: string;
 };
 
 export const generateGrid = (
@@ -33,7 +34,8 @@ export const generateGrid = (
                 height: cellSize,   // Cell height
                 isBomb: Math.random() < frequency,
                 bombsAround: 0,
-                pressed: false
+                pressed: false,
+                text: ''
             });
         }
     }
