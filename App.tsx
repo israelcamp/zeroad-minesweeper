@@ -22,13 +22,19 @@ function App(): React.JSX.Element {
 
   const { width, height } = getScreenSize();
   const safePadding = 3;
+  const rows = 6;
+  const columns = 4;
+  const frequency = 0.1;
 
-  const [grid, setGrid] = useState<GridCell[]>(generateGrid(width, height, safePadding, 4));
+  const resetGrid = () => generateGrid(width, height, safePadding, rows, columns, frequency)
+
+  const [grid, setGrid] = useState<GridCell[]>(resetGrid());
 
   const handleCellPress = (cell: GridCell, index: number) => {
+    const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : cell.bombsAround.toString() };
     setGrid(prevGrid =>
       prevGrid.map((cell, i) =>
-        i === index ? { ...cell, pressed: true, text: cell.isBomb ? '💣' : cell.bombsAround.toString() } : cell
+        i === index ? updatedCell : cell
       )
     );
 
@@ -68,13 +74,13 @@ function App(): React.JSX.Element {
           </Pressable>
         ))
         }
-      </View >
+      </View>
       <View>
-        <TouchableOpacity style={styles.button} onPress={() => setGrid(generateGrid(width, height, safePadding, 4))}>
+        <TouchableOpacity style={styles.button} onPress={() => setGrid(resetGrid())}>
           <Text style={styles.text}>RESTART</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </View >
   );
 }
 

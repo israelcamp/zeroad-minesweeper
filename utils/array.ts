@@ -13,6 +13,7 @@ export const generateGrid = (
     width: number,
     height: number,
     padding: number,
+    rows: number = 5,
     columns: number = 5,
     frequency: number = 0.1
 ): GridCell[] => {
@@ -25,7 +26,7 @@ export const generateGrid = (
 
     const grid: GridCell[] = [];
 
-    for (let row = 0; row < columns; row++) {
+    for (let row = 0; row < rows; row++) {
         for (let col = 0; col < columns; col++) {
             grid.push({
                 x: startX + col * cellSize,   // X position
@@ -39,7 +40,7 @@ export const generateGrid = (
             });
         }
     }
-    return calculateGridTexts(grid, columns, columns);
+    return calculateGridTexts(grid, rows, columns);
 };
 
 const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => {
