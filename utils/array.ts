@@ -14,7 +14,7 @@ export const generateGrid = (
     height: number,
     padding: number,
     columns: number = 5,
-    frequency: number = 0.4
+    frequency: number = 0.1
 ): GridCell[] => {
 
     const startX = width * padding / 100;

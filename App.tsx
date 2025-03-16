@@ -11,7 +11,8 @@ import {
   Text,
   Alert,
   View,
-  Pressable
+  Pressable,
+  TouchableOpacity
 } from 'react-native';
 
 import { getScreenSize } from './utils/dimension';
@@ -47,32 +48,44 @@ function App(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
-      {grid.map((cell, index) => (
-        <Pressable
-          key={index}
-          onPress={() => handleCellPress(cell, index)}
-          style={() => [
-            styles.cell,
-            {
-              left: cell.x,
-              top: cell.y,
-              width: cell.width,
-              height: cell.height,
-              backgroundColor: cell.pressed ? 'white' : 'lightgray', // Visual feedback on press
-            },
-          ]}
-        >
-          <Text>{cell.pressed ? cell.text : ''}</Text>
-        </Pressable>
-      ))
-      }
-    </View >
+      <View style={styles.grid}>
+        {grid.map((cell, index) => (
+          <Pressable
+            key={index}
+            onPress={() => handleCellPress(cell, index)}
+            style={() => [
+              styles.cell,
+              {
+                left: cell.x,
+                top: cell.y,
+                width: cell.width,
+                height: cell.height,
+                backgroundColor: cell.pressed ? 'white' : 'lightgray', // Visual feedback on press
+              },
+            ]}
+          >
+            <Text>{cell.pressed ? cell.text : ''}</Text>
+          </Pressable>
+        ))
+        }
+      </View >
+      <View>
+        <TouchableOpacity style={styles.button} onPress={() => setGrid(generateGrid(width, height, safePadding, 4))}>
+          <Text style={styles.text}>RESTART</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 // Styles
 const styles = StyleSheet.create({
   container: {
+    flex: 1, // Takes full screen height
+    justifyContent: 'center', // Centers content
+    alignItems: 'center', // Centers horizontally
+  },
+  grid: {
     position: 'absolute',
     width: '100%',
     height: '100%'
@@ -83,6 +96,17 @@ const styles = StyleSheet.create({
     borderColor: 'black', // Change color if needed
     justifyContent: 'center', // Center vertically
     alignItems: 'center', // Center horizontally
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  text: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 
