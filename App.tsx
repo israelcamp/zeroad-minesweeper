@@ -75,7 +75,7 @@ function App(): React.JSX.Element {
         ))
         }
       </View>
-      <View>
+      <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => setGrid(resetGrid())}>
           <Text style={styles.text}>RESTART</Text>
         </TouchableOpacity>
@@ -87,27 +87,35 @@ function App(): React.JSX.Element {
 // Styles
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // Takes full screen height
-    justifyContent: 'center', // Centers content
-    alignItems: 'center', // Centers horizontally
+    flex: 1,
+    justifyContent: 'space-between', // Distributes space between grid and button
+    alignItems: 'center',
+    paddingVertical: 20, // Adds padding to prevent overlap
   },
   grid: {
-    position: 'absolute',
+    flex: 1, // Takes up remaining space
     width: '100%',
-    height: '100%'
+    justifyContent: 'center', // Centers content vertically
+    alignItems: 'center', // Centers content horizontally
   },
   cell: {
     position: 'absolute',
     borderWidth: 1,
-    borderColor: 'black', // Change color if needed
-    justifyContent: 'center', // Center vertically
-    alignItems: 'center', // Center horizontally
+    borderColor: 'black',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center', // Centers button
+    paddingBottom: 20, // Adds space below button
   },
   button: {
     backgroundColor: 'blue',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
+    width: '50%', // Adjust width if needed
   },
   text: {
     color: 'white',
