@@ -14,6 +14,7 @@ import {
   Pressable,
   TouchableOpacity
 } from 'react-native';
+import Icon from "react-native-vector-icons/FontAwesome6";
 
 import { getScreenSize } from './utils/dimension';
 import { generateGrid, GridCell, updateCellsAround, checkVictory } from './utils/array';
@@ -24,7 +25,7 @@ function App(): React.JSX.Element {
   const safePadding = 3;
   const rows = 6;
   const columns = 4;
-  const frequency = 0.1;
+  const frequency = 0.5;
 
   const resetGrid = () => generateGrid(width, height, safePadding, rows, columns, frequency)
 
@@ -38,10 +39,23 @@ function App(): React.JSX.Element {
     updateCellsAround(index, newGrid, rows, columns);
     setGrid(newGrid);
     const victory = checkVictory(newGrid);
-    if (victory) Alert.alert('VICTORY!');
-    if (grid[index].isBomb) Alert.alert('You lost');
+    // if (victory) Alert.alert('VICTORY!');
+    // if (grid[index].isBomb) Alert.alert('You lost');
   };
 
+  const bombColors = {
+    0: "#F1F1F1",
+    1: "#A8DADC",
+    2: "#2A9D8F",
+    3: "#E9C46A",
+    4: "#F4A261",  // Orange for '4'
+    5: "#E76F51",  // Red-Orange for '5'
+    6: "#8A4F7D",  // Purple for '6'
+    7: "#264653",  // Dark Blue for '7'
+    8: "#1D3557",  // Very Dark Blue for '8'
+    default: "#B0BEC5", // Gray for unknown cases
+  };
+  const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
 
   /*
    * To keep the template simple and small we're adding padding to prevent view
@@ -67,11 +81,17 @@ function App(): React.JSX.Element {
                 top: cell.y,
                 width: cell.width,
                 height: cell.height,
-                backgroundColor: cell.pressed ? 'white' : 'lightgray', // Visual feedback on press
+                backgroundColor: cell.pressed
+                  ? cell.isBomb
+                    ? "#E63946" // Red for bombs
+                    : bombColors[cell.bombsAround] || bombColors.default // Use mapped color or default
+                  : "#B0BEC5", // Gray for unopened cells
               },
             ]}
           >
-            <Text>{cell.pressed ? cell.text : ''}</Text>
+            <Text style={[styles.cellText, { color: cell.pressed ? "#1D3557" : "white" }]}>
+              {cell.pressed && cell.isBomb ? <BombIcon /> : <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>}
+            </Text>
           </Pressable>
         ))
         }
@@ -99,12 +119,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // Centers content vertically
     alignItems: 'center', // Centers content horizontally
   },
+  cellText: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
   cell: {
     position: 'absolute',
     borderWidth: 1,
     borderColor: 'black',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   buttonContainer: {
     width: '100%',
