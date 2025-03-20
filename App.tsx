@@ -45,14 +45,12 @@ function App(): React.JSX.Element {
 
   const bombColors = {
     0: "#F1F1F1",
-    1: "#A8DADC",
+    1: "#346beb",
     2: "#2A9D8F",
     3: "#E9C46A",
-    4: "#F4A261",  // Orange for '4'
-    5: "#E76F51",  // Red-Orange for '5'
-    6: "#8A4F7D",  // Purple for '6'
-    7: "#264653",  // Dark Blue for '7'
-    8: "#1D3557",  // Very Dark Blue for '8'
+    4: "#8d07a8",  // Orange for '4'
+    5: "#82625a",  // Red-Orange for '5'
+    6: "#556d87",  // Purple for '6'
     default: "#B0BEC5", // Gray for unknown cases
   };
   const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
@@ -89,7 +87,7 @@ function App(): React.JSX.Element {
               },
             ]}
           >
-            <Text style={[styles.cellText, { color: cell.pressed ? "#1D3557" : "white" }]}>
+            <Text style={[styles.cellText, { color: cell.pressed ? "#09090a" : "white" }]}>
               {cell.pressed && cell.isBomb ? <BombIcon /> : <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>}
             </Text>
           </Pressable>
