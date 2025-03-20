@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 
 import { getScreenSize } from './utils/dimension';
-import { generateGrid, GridCell } from './utils/array';
+import { generateGrid, GridCell, updateCellsAround, checkVictory } from './utils/array';
 
 function App(): React.JSX.Element {
 
@@ -32,12 +32,13 @@ function App(): React.JSX.Element {
 
   const handleCellPress = (cell: GridCell, index: number) => {
     const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : cell.bombsAround.toString() };
-    setGrid(prevGrid =>
-      prevGrid.map((cell, i) =>
-        i === index ? updatedCell : cell
-      )
-    );
-
+    const newGrid = grid.map((cell, i) =>
+      i === index ? updatedCell : cell
+    )
+    updateCellsAround(index, newGrid, rows, columns);
+    setGrid(newGrid);
+    const victory = checkVictory(newGrid);
+    if (victory) Alert.alert('VICTORY!');
     if (grid[index].isBomb) Alert.alert('You lost');
   };
 

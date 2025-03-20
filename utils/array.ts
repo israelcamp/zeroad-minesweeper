@@ -81,3 +81,56 @@ const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => 
     }
     return grid
 }
+
+export const updateCellsAround = (index: number, grid: GridCell[], rows: number, columns: number) => {
+
+    if (grid[index].bombsAround > 0 || grid[index].isBomb) return;
+
+    const rowIndex = Math.floor(index / columns);
+    const colIndex = index % columns;
+
+    const checkCell = (index: number) => {
+        const currentCell = grid[index];
+        const alreadyPressed = currentCell.pressed;
+        if (alreadyPressed) return;
+        if (!currentCell.isBomb) {
+            currentCell.text = currentCell.bombsAround.toString();
+            currentCell.pressed = true;
+        }
+        if (currentCell.bombsAround === 0) return updateCellsAround(index, grid, rows, columns);
+    }
+
+    // check if there is top left
+    if (colIndex != 0 && rowIndex > 0) checkCell(index - columns - 1);
+
+    // check top mid
+    if (rowIndex > 0) checkCell(index - columns);
+
+    // top right
+    if (colIndex != columns - 1 && rowIndex > 0) checkCell(index - columns + 1);
+
+    // mid left
+    if (colIndex > 0) checkCell(index - 1);
+
+    // mid right
+    if (colIndex < columns - 1) checkCell(index + 1);
+
+    // bottom left
+    if (rowIndex < rows - 1 && colIndex > 0) checkCell(index + columns - 1);
+
+    // bottom mid
+    if (rowIndex < rows - 1) checkCell(index + columns);
+
+    // bottom right
+    if (rowIndex < rows - 1 && colIndex < columns - 1) checkCell(index + columns + 1);
+}
+
+export const checkVictory = (grid: GridCell[]) => {
+    let countTotalBombs = 0;
+    let countRemainingCells = 0;
+    for (const cell of grid) {
+        if (!cell.pressed) countRemainingCells++;
+        if (cell.isBomb) countTotalBombs++;
+    }
+    return countTotalBombs === countRemainingCells;
+}
