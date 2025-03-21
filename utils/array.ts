@@ -9,38 +9,63 @@ export type GridCell = {
     text: string;
 };
 
-export const generateGrid = (
+export type GridConfig = {
+    startX: number;
+    startY: number;
+    finalWidth: number;
+    cellSize: number;
+    rows: number;
+    columns: number;
+    frequency: number;
+}
+
+export const getGridConfig = (
     width: number,
     height: number,
     padding: number,
-    rows: number = 5,
     columns: number = 5,
     frequency: number = 0.1
-): GridCell[] => {
-
+): GridConfig => {
     const startX = width * padding / 100;
     const startY = height * padding / 100
 
-    const finalWidth = (width - 2 * width * padding / 100);
+    const finalWidth = width;
     const cellSize = finalWidth / columns;
+    const rows = Math.floor(height / cellSize);
+
+    return {
+        startX,
+        startY,
+        finalWidth,
+        cellSize,
+        rows,
+        columns, frequency
+    }
+}
+
+export const getCellText = (cell: GridCell) => (cell.bombsAround > 0 ? cell.bombsAround.toString() : "");
+
+export const generateGrid = (
+    gridConfig: GridConfig
+): GridCell[] => {
 
     const grid: GridCell[] = [];
 
-    for (let row = 0; row < rows; row++) {
-        for (let col = 0; col < columns; col++) {
+    for (let row = 0; row < gridConfig.rows; row++) {
+        for (let col = 0; col < gridConfig.columns; col++) {
             grid.push({
-                x: startX + col * cellSize,   // X position
-                y: startY + row * cellSize,  // Y position
-                width: cellSize,     // Cell width
-                height: cellSize,   // Cell height
-                isBomb: Math.random() < frequency,
+                x: gridConfig.startX + col * gridConfig.cellSize,   // X position
+                y: gridConfig.startY + row * gridConfig.cellSize,  // Y position
+                width: gridConfig.cellSize,     // Cell width
+                height: gridConfig.cellSize,   // Cell height
+                isBomb: Math.random() < gridConfig.frequency,
                 bombsAround: 0,
                 pressed: false,
                 text: ''
             });
         }
     }
-    return calculateGridTexts(grid, rows, columns);
+    return calculateGridTexts(grid, gridConfig.rows, gridConfig.columns);
 };
 
 const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => {
@@ -94,7 +119,7 @@ export const updateCellsAround = (index: number, grid: GridCell[], rows: number,
         const alreadyPressed = currentCell.pressed;
         if (alreadyPressed) return;
         if (!currentCell.isBomb) {
-            currentCell.text = currentCell.bombsAround.toString();
+            currentCell.text = getCellText(currentCell);
             currentCell.pressed = true;
         }
         if (currentCell.bombsAround === 0) return updateCellsAround(index, grid, rows, columns);

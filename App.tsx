@@ -17,26 +17,28 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome6";
 
 import { getScreenSize } from './utils/dimension';
-import { generateGrid, GridCell, updateCellsAround, checkVictory } from './utils/array';
+import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig } from './utils/array';
+
 
 function App(): React.JSX.Element {
 
   const { width, height } = getScreenSize();
-  const safePadding = 3;
-  const rows = 6;
-  const columns = 4;
-  const frequency = 0.5;
+  const safePadding = 0;
+  const columns = 8;
+  const frequency = 0.1;
 
-  const resetGrid = () => generateGrid(width, height, safePadding, rows, columns, frequency)
+  const gridConfig = getGridConfig(width, height, safePadding, columns, frequency);
+
+  const resetGrid = () => generateGrid(gridConfig);
 
   const [grid, setGrid] = useState<GridCell[]>(resetGrid());
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : cell.bombsAround.toString() };
+    const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell) };
     const newGrid = grid.map((cell, i) =>
       i === index ? updatedCell : cell
     )
-    updateCellsAround(index, newGrid, rows, columns);
+    updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
     setGrid(newGrid);
     const victory = checkVictory(newGrid);
     // if (victory) Alert.alert('VICTORY!');
@@ -67,6 +69,13 @@ function App(): React.JSX.Element {
 
   return (
     <View style={styles.container}>
+      <View style={{
+        width: "100%",
+        height: "8%",
+        borderBottomColor: "black",
+        borderBottomWidth: 1,
+        backgroundColor: "#505861"
+      }}></View>
       <View style={styles.grid}>
         {grid.map((cell, index) => (
           <Pressable
@@ -94,11 +103,6 @@ function App(): React.JSX.Element {
         ))
         }
       </View>
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => setGrid(resetGrid())}>
-          <Text style={styles.text}>RESTART</Text>
-        </TouchableOpacity>
-      </View>
     </View >
   );
 }
@@ -109,7 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between', // Distributes space between grid and button
     alignItems: 'center',
-    paddingVertical: 20, // Adds padding to prevent overlap
+    paddingVertical: 0, // Adds padding to prevent overlap
   },
   grid: {
     flex: 1, // Takes up remaining space
