@@ -31,7 +31,7 @@ export const getGridConfig = (
 
     const finalWidth = width;
     const cellSize = finalWidth / columns;
-    const rows = Math.floor(height / cellSize);
+    const rows = Math.floor(height / cellSize) - 1;
 
     return {
         startX,
