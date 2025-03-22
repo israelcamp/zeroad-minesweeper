@@ -49,6 +49,11 @@ function App(): React.JSX.Element {
 
   const [emoji, setEmoji] = useState<string>(emojis.playing);
 
+  const resetGame = () => {
+    setGrid(resetGrid);
+    setEmoji(emojis.playing);
+  }
+
   const handleCellPress = (cell: GridCell, index: number) => {
     const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell) };
     const newGrid = grid.map((cell, i) =>
@@ -76,7 +81,9 @@ function App(): React.JSX.Element {
 
   const header = () => (
     <View style={styles.header}>
-      <Text style={{ fontSize: 34 }}>{emoji}</Text>
+      <TouchableOpacity onPress={resetGame}>
+        <Text style={{ fontSize: 34 }}>{emoji}</Text>
+      </TouchableOpacity>
     </View>
   )
 
