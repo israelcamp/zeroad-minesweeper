@@ -7,6 +7,7 @@ export type GridCell = {
     bombsAround: number;
     pressed: boolean;
     text: string;
+    index: number;
 };
 
 export type GridConfig = {
@@ -51,6 +52,7 @@ export const generateGrid = (
 
     const grid: GridCell[] = [];
 
+    let index = 0;
     for (let row = 0; row < gridConfig.rows; row++) {
         for (let col = 0; col < gridConfig.columns; col++) {
             grid.push({
@@ -61,8 +63,10 @@ export const generateGrid = (
                 isBomb: Math.random() < gridConfig.frequency,
                 bombsAround: -1,
                 pressed: false,
-                text: ''
+                text: '',
+                index
             });
+            index++;
         }
     }
     return calculateGridTexts(grid, gridConfig.rows, gridConfig.columns);

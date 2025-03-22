@@ -79,6 +79,9 @@ function App(): React.JSX.Element {
    * https://github.com/react-native-community/discussions-and-proposals/discussions/827
    */
 
+  const gridNotBomb = grid.filter((cell) => !cell.isBomb);
+  const gridBomb = grid.filter((cell) => cell.isBomb);
+
   const header = () => (
     <View style={styles.header}>
       <TouchableOpacity onPress={resetGame}>
@@ -87,34 +90,36 @@ function App(): React.JSX.Element {
     </View>
   )
 
+  const displayCell = (cell: GridCell) => (
+    <Pressable
+      key={cell.index}
+      onPress={() => handleCellPress(cell, cell.index)}
+      style={() => [
+        styles.cell,
+        {
+          left: cell.x,
+          top: cell.y,
+          width: cell.width,
+          height: cell.height,
+          backgroundColor: cell.pressed
+            ? cell.isBomb
+              ? "#E63946" // Red for bombs
+              : bombColors[cell.bombsAround] || bombColors.default // Use mapped color or default
+            : "#B0BEC5", // Gray for unopened cells
+          borderWidth: cell.pressed ? 0 : 0.5
+        },
+      ]}
+    >
+      <Text style={[styles.cellText, { color: cell.pressed ? "#09090a" : "white" }]}>
+        {cell.pressed && cell.isBomb ? <BombIcon /> : <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>}
+      </Text>
+    </Pressable>
+  )
+
   const gridView = () => (
     <View style={styles.grid}>
-      {grid.map((cell, index) => (
-        <Pressable
-          key={index}
-          onPress={() => handleCellPress(cell, index)}
-          style={() => [
-            styles.cell,
-            {
-              left: cell.x,
-              top: cell.y,
-              width: cell.width,
-              height: cell.height,
-              backgroundColor: cell.pressed
-                ? cell.isBomb
-                  ? "#E63946" // Red for bombs
-                  : bombColors[cell.bombsAround] || bombColors.default // Use mapped color or default
-                : "#B0BEC5", // Gray for unopened cells
-              borderWidth: cell.pressed ? 0 : 0.5
-            },
-          ]}
-        >
-          <Text style={[styles.cellText, { color: cell.pressed ? "#09090a" : "white" }]}>
-            {cell.pressed && cell.isBomb ? <BombIcon /> : <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>}
-          </Text>
-        </Pressable>
-      ))
-      }
+      {gridNotBomb.map(cell => displayCell(cell))}
+      {gridBomb.map(cell => displayCell(cell))}
     </View>
   )
 
