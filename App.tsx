@@ -20,7 +20,7 @@ import { getScreenSize } from './utils/dimension';
 import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig } from './utils/array';
 
 const bombColors = {
-  0: "#F1F1F1",
+  0: "#e3dcdc",
   1: "#346beb",
   2: "#2A9D8F",
   3: "#E9C46A",
@@ -105,6 +105,7 @@ function App(): React.JSX.Element {
                   ? "#E63946" // Red for bombs
                   : bombColors[cell.bombsAround] || bombColors.default // Use mapped color or default
                 : "#B0BEC5", // Gray for unopened cells
+              borderWidth: cell.pressed ? 0 : 0.5
             },
           ]}
         >
@@ -156,7 +157,6 @@ const styles = StyleSheet.create({
   },
   cell: {
     position: 'absolute',
-    borderWidth: 1,
     borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center'

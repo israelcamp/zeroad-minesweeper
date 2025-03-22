@@ -59,7 +59,7 @@ export const generateGrid = (
                 width: gridConfig.cellSize,     // Cell width
                 height: gridConfig.cellSize,   // Cell height
                 isBomb: Math.random() < gridConfig.frequency,
-                bombsAround: 0,
+                bombsAround: -1,
                 pressed: false,
                 text: ''
             });
