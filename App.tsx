@@ -18,8 +18,23 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 
 import { getScreenSize } from './utils/dimension';
 import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig } from './utils/array';
-import { Header } from 'react-native/Libraries/NewAppScreen';
 
+const bombColors = {
+  0: "#F1F1F1",
+  1: "#346beb",
+  2: "#2A9D8F",
+  3: "#E9C46A",
+  4: "#8d07a8",  // Orange for '4'
+  5: "#82625a",  // Red-Orange for '5'
+  6: "#556d87",  // Purple for '6'
+  default: "#B0BEC5", // Gray for unknown cases
+};
+
+const emojis = {
+  playing: '😃',
+  victory: '😎',
+  defeat: '😵'
+}
 
 function App(): React.JSX.Element {
 
@@ -28,11 +43,11 @@ function App(): React.JSX.Element {
   const columns = 8;
   const frequency = 0.1;
 
-  const gridConfig = getGridConfig(width, height, safePadding, columns, frequency);
-
+  const gridConfig: GridConfig = getGridConfig(width, height, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
-
   const [grid, setGrid] = useState<GridCell[]>(resetGrid());
+
+  const [emoji, setEmoji] = useState<string>(emojis.playing);
 
   const handleCellPress = (cell: GridCell, index: number) => {
     const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell) };
@@ -42,20 +57,11 @@ function App(): React.JSX.Element {
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
     setGrid(newGrid);
     const victory = checkVictory(newGrid);
-    // if (victory) Alert.alert('VICTORY!');
-    // if (grid[index].isBomb) Alert.alert('You lost');
+    if (victory) setEmoji(emojis.victory);
+    if (grid[index].isBomb) setEmoji(emojis.defeat);
   };
 
-  const bombColors = {
-    0: "#F1F1F1",
-    1: "#346beb",
-    2: "#2A9D8F",
-    3: "#E9C46A",
-    4: "#8d07a8",  // Orange for '4'
-    5: "#82625a",  // Red-Orange for '5'
-    6: "#556d87",  // Purple for '6'
-    default: "#B0BEC5", // Gray for unknown cases
-  };
+
   const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
 
   /*
@@ -69,13 +75,9 @@ function App(): React.JSX.Element {
    */
 
   const header = () => (
-    <View style={{
-      width: "100%",
-      height: "8%",
-      borderBottomColor: "black",
-      borderBottomWidth: 1,
-      backgroundColor: "#505861"
-    }}></View>
+    <View style={styles.header}>
+      <Text style={{ fontSize: 34 }}>{emoji}</Text>
+    </View>
   )
 
   const gridView = () => (
@@ -124,6 +126,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 0, // Adds padding to prevent overlap
   },
+  header: {
+    width: "100%",
+    height: "8%",
+    borderBottomColor: "black",
+    borderBottomWidth: 1,
+    backgroundColor: "#505861",
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: '3%'
+  },
   grid: {
     flex: 1, // Takes up remaining space
     width: '100%',
@@ -141,18 +153,6 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  buttonContainer: {
-    width: '100%',
-    alignItems: 'center', // Centers button
-    paddingBottom: 20, // Adds space below button
-  },
-  button: {
-    backgroundColor: 'blue',
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    width: '50%', // Adjust width if needed
   },
   text: {
     color: 'white',
