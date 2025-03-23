@@ -49,25 +49,44 @@ function App(): React.JSX.Element {
 
   const gridConfig: GridConfig = getGridConfig(width, height, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
-  const [grid, setGrid] = useState<GridCell[]>(resetGrid());
 
+  const [gameStarted, setGameStarted] = useState<boolean>(false);
+  const [grid, setGrid] = useState<GridCell[]>(resetGrid());
   const [start, setStart] = useState<number>(getTimestamp());
   const [elapsed, setElapsed] = useState<number>(getTimestamp());
   const [emoji, setEmoji] = useState<string>(emojis.playing);
 
   useEffect(() => {
-    const interval = setInterval(() => setElapsed(getSecondsDiff(getTimestamp(), start)), 1000);
+    const interval = setInterval(() => {
+      if (gameStarted) {
+        const elapsed = getSecondsDiff(getTimestamp(), start);
+        setElapsed(elapsed);
+      }
+    }, 1000);
     return () => clearInterval(interval);
-  }, [start]);
+  }, [start, gameStarted]);
 
   const resetGame = () => {
     setGrid(resetGrid);
     setElapsed(0);
     setStart(getTimestamp());
-    setEmoji(emojis.playing);
+    endGame(emojis.playing);
   }
 
+  const startGame = () => {
+    setGameStarted(true);
+    setStart(getTimestamp());
+  };
+
+  const endGame = (emoji: string) => {
+    setEmoji(emoji);
+    setGameStarted(false);
+  };
+
   const handleCellPress = (cell: GridCell, index: number) => {
+    if (!gameStarted) {
+      startGame();
+    }
     const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell) };
     const newGrid = grid.map((cell, i) =>
       i === index ? updatedCell : cell
@@ -75,8 +94,8 @@ function App(): React.JSX.Element {
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
     setGrid(newGrid);
     const victory = checkVictory(newGrid);
-    if (victory) setEmoji(emojis.victory);
-    if (grid[index].isBomb) setEmoji(emojis.defeat);
+    if (victory) endGame(emojis.victory);
+    if (grid[index].isBomb) endGame(emojis.defeat);
   };
 
   /*
