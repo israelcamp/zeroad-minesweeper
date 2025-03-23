@@ -36,6 +36,14 @@ const emojis = {
   defeat: '😵'
 }
 
+type GameState = {
+  gameStarted: boolean,
+  grid: GridCell[],
+  start: number,
+  elapsed: number,
+  emoji: string,
+}
+
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
@@ -50,74 +58,82 @@ function App(): React.JSX.Element {
   const gridConfig: GridConfig = getGridConfig(width, height, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
 
-  const [gameStarted, setGameStarted] = useState<boolean>(false);
-  const [grid, setGrid] = useState<GridCell[]>(resetGrid());
-  const [start, setStart] = useState<number>(getTimestamp());
-  const [elapsed, setElapsed] = useState<number>(getTimestamp());
-  const [emoji, setEmoji] = useState<string>(emojis.playing);
+  const [state, setState] = useState<GameState>({
+    gameStarted: false,
+    grid: resetGrid(),
+    start: getTimestamp(),
+    elapsed: 0,
+    emoji: emojis.playing,
+  });
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (gameStarted) {
-        const elapsed = getSecondsDiff(getTimestamp(), start);
-        setElapsed(elapsed);
+      if (state.gameStarted) {
+        const elapsed = getSecondsDiff(getTimestamp(), state.start);
+        setState({ ...state, elapsed });
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [start, gameStarted]);
+  }, [state]);
 
   const resetGame = () => {
-    setGrid(resetGrid);
-    setElapsed(0);
-    setStart(getTimestamp());
-    endGame(emojis.playing);
+    const updateState = {
+      gameStarted: false,
+      grid: resetGrid(),
+      start: getTimestamp(),
+      elapsed: 0,
+      emoji: emojis.playing,
+    };
+    setState({ ...state, ...updateState });
   }
 
-  const startGame = () => {
-    setGameStarted(true);
-    setStart(getTimestamp());
+  const startGameState = (state: GameState) => {
+    return {
+      ...state,
+      gameStarted: true,
+      start: getTimestamp(),
+    };
   };
 
-  const endGame = (emoji: string) => {
-    setEmoji(emoji);
-    setGameStarted(false);
+  const endGameState = (state: GameState, emoji: string) => {
+    return {
+      ...state,
+      gameStarted: false,
+      emoji,
+    };
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    if (!gameStarted) {
-      startGame();
+    let newState = { ...state };
+    if (!newState.gameStarted) {
+      newState = startGameState(newState);
     }
     const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell) };
-    const newGrid = grid.map((cell, i) =>
+    const newGrid = newState.grid.map((cell, i) =>
       i === index ? updatedCell : cell
     )
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
-    setGrid(newGrid);
+    newState.grid = newGrid;
     const victory = checkVictory(newGrid);
-    if (victory) endGame(emojis.victory);
-    if (grid[index].isBomb) endGame(emojis.defeat);
+    if (victory) {
+      newState = endGameState(newState, emojis.victory);
+    };
+    if (cell.isBomb) {
+      newState = endGameState(newState, emojis.defeat);
+    };
+    setState(newState);
   };
 
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the reccomendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-
-  const gridNotBomb = grid.filter((cell) => !cell.isBomb);
-  const gridBomb = grid.filter((cell) => cell.isBomb);
+  const gridNotBomb = state.grid.filter((cell) => !cell.isBomb);
+  const gridBomb = state.grid.filter((cell) => cell.isBomb);
 
   const header = () => (
     <View style={styles.header}>
-      <Text style={styles.timer}>{elapsed}</Text>
+      <Text style={styles.timer}>{state.elapsed}</Text>
       <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
-        <Text style={styles.emoji}>{emoji}</Text>
+        <Text style={styles.emoji}>{state.emoji}</Text>
       </TouchableOpacity>
-      <Text style={styles.timer}>{elapsed}</Text>
+      <Text style={styles.timer}>{state.elapsed}</Text>
     </View>
   );
 
