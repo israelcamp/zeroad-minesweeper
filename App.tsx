@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -36,6 +36,10 @@ const emojis = {
   defeat: '😵'
 }
 
+const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
+const getTimestamp = () => new Date().getTime();
+const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
+
 function App(): React.JSX.Element {
 
   const { width, height } = getScreenSize();
@@ -47,10 +51,19 @@ function App(): React.JSX.Element {
   const resetGrid = () => generateGrid(gridConfig);
   const [grid, setGrid] = useState<GridCell[]>(resetGrid());
 
+  const [start, setStart] = useState<number>(getTimestamp());
+  const [elapsed, setElapsed] = useState<number>(getTimestamp());
   const [emoji, setEmoji] = useState<string>(emojis.playing);
+
+  useEffect(() => {
+    const interval = setInterval(() => setElapsed(getSecondsDiff(getTimestamp(), start)), 1000);
+    return () => clearInterval(interval);
+  }, [start]);
 
   const resetGame = () => {
     setGrid(resetGrid);
+    setElapsed(0);
+    setStart(getTimestamp());
     setEmoji(emojis.playing);
   }
 
@@ -65,9 +78,6 @@ function App(): React.JSX.Element {
     if (victory) setEmoji(emojis.victory);
     if (grid[index].isBomb) setEmoji(emojis.defeat);
   };
-
-
-  const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
 
   /*
    * To keep the template simple and small we're adding padding to prevent view
@@ -84,11 +94,13 @@ function App(): React.JSX.Element {
 
   const header = () => (
     <View style={styles.header}>
-      <TouchableOpacity onPress={resetGame}>
-        <Text style={{ fontSize: 34 }}>{emoji}</Text>
+      <Text style={styles.timer}>{elapsed}</Text>
+      <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
+        <Text style={styles.emoji}>{emoji}</Text>
       </TouchableOpacity>
+      <Text style={styles.timer}>{elapsed}</Text>
     </View>
-  )
+  );
 
   const displayCell = (cell: GridCell) => (
     <Pressable
@@ -139,16 +151,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 0, // Adds padding to prevent overlap
   },
-  header: {
-    width: "100%",
-    height: "8%",
-    borderBottomColor: "black",
-    borderBottomWidth: 1,
-    backgroundColor: "#505861",
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: '3%'
-  },
   grid: {
     flex: 1, // Takes up remaining space
     width: '100%',
@@ -170,6 +172,31 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between", // Keeps the two timers apart
+    alignItems: "center",
+    paddingTop: '5%',
+    paddingRight: '8%',
+    paddingLeft: '8%',
+    paddingBottom: '1%',
+    backgroundColor: "#264653",
+    borderBottomColor: "black",
+    borderBottomWidth: 2,
+  },
+  timer: {
+    fontSize: 34,
+    color: "white",
+    width: 60, // Ensures equal spacing on both sides
+    textAlign: "center",
+  },
+  emojiButton: {
+    flex: 1, // Takes up remaining space
+    alignItems: "center", // Centers the emoji horizontally
+  },
+  emoji: {
+    fontSize: 34,
   },
 });
 
