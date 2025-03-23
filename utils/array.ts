@@ -163,3 +163,12 @@ export const checkVictory = (grid: GridCell[]) => {
     }
     return countTotalBombs === countRemainingCells;
 }
+
+export const openBombs = (grid: GridCell[]) => {
+    for (const cell of grid) {
+        if (cell.isBomb) {
+            cell.text = '💣';
+            cell.pressed = true;
+        }
+    }
+}

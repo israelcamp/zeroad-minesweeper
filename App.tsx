@@ -15,9 +15,16 @@ import {
   TouchableOpacity
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
+import { trigger } from "react-native-haptic-feedback";
 
 import { getScreenSize } from './utils/dimension';
-import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig } from './utils/array';
+import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig, openBombs } from './utils/array';
+
+// Optional configuration
+const options = {
+  enableVibrateFallback: true,
+  ignoreAndroidSystemSettings: false,
+};
 
 const bombColors = {
   0: "#e3dcdc",
@@ -38,6 +45,7 @@ const emojis = {
 
 type GameState = {
   gameStarted: boolean,
+  gameEnded: boolean,
   grid: GridCell[],
   start: number,
   elapsed: number,
@@ -60,6 +68,7 @@ function App(): React.JSX.Element {
 
   const [state, setState] = useState<GameState>({
     gameStarted: false,
+    gameEnded: false,
     grid: resetGrid(),
     start: getTimestamp(),
     elapsed: 0,
@@ -79,6 +88,7 @@ function App(): React.JSX.Element {
   const resetGame = () => {
     const updateState = {
       gameStarted: false,
+      gameEnded: false,
       grid: resetGrid(),
       start: getTimestamp(),
       elapsed: 0,
@@ -99,11 +109,17 @@ function App(): React.JSX.Element {
     return {
       ...state,
       gameStarted: false,
+      gameEnded: true,
       emoji,
     };
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
+    trigger("impactLight", options);
+    if (state.gameEnded) {
+      return;
+    }
+
     let newState = { ...state };
     if (!newState.gameStarted) {
       newState = startGameState(newState);
@@ -119,6 +135,7 @@ function App(): React.JSX.Element {
       newState = endGameState(newState, emojis.victory);
     };
     if (cell.isBomb) {
+      openBombs(newState.grid);
       newState = endGameState(newState, emojis.defeat);
     };
     setState(newState);
