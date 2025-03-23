@@ -8,6 +8,7 @@ export type GridCell = {
     pressed: boolean;
     text: string;
     index: number;
+    hasFlag: boolean;
 };
 
 export type GridConfig = {
@@ -64,6 +65,7 @@ export const generateGrid = (
                 bombsAround: -1,
                 pressed: false,
                 text: '',
+                hasFlag: false,
                 index
             });
             index++;
@@ -121,7 +123,7 @@ export const updateCellsAround = (index: number, grid: GridCell[], rows: number,
     const checkCell = (index: number) => {
         const currentCell = grid[index];
         const alreadyPressed = currentCell.pressed;
-        if (alreadyPressed) return;
+        if (alreadyPressed || currentCell.hasFlag) return;
         if (!currentCell.isBomb) {
             currentCell.text = getCellText(currentCell);
             currentCell.pressed = true;

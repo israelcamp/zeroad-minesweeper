@@ -53,10 +53,13 @@ type GameState = {
 }
 
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
+const FlagIcon = () => <Icon name="flag" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 
 function App(): React.JSX.Element {
+
+
 
   const { width, height } = getScreenSize();
   const safePadding = 0;
@@ -114,9 +117,34 @@ function App(): React.JSX.Element {
     };
   };
 
+  const toogleFlag = (cell: GridCell) => {
+    trigger("impactMedium", options);
+    if (state.gameEnded) {
+      return;
+    }
+    let newState = { ...state };
+    if (!newState.gameStarted) {
+      newState = startGameState(newState);
+    }
+    if (!cell.pressed) {
+      const newGrid = newState.grid.map((c) => {
+        if (c.index === cell.index) {
+          return { ...c, hasFlag: !c.hasFlag };
+        }
+        return c;
+      });
+      newState.grid = newGrid;
+    }
+
+    setState({ ...newState });
+  };
+
   const handleCellPress = (cell: GridCell, index: number) => {
     trigger("impactLight", options);
     if (state.gameEnded) {
+      return;
+    }
+    if (cell.hasFlag) {
       return;
     }
 
@@ -141,6 +169,12 @@ function App(): React.JSX.Element {
     setState(newState);
   };
 
+  const cellText = (cell: GridCell) => {
+    if (cell.hasFlag) return <FlagIcon />;
+    if (cell.isBomb && cell.pressed) return <BombIcon />;
+    return <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>
+  };
+
   const gridNotBomb = state.grid.filter((cell) => !cell.isBomb);
   const gridBomb = state.grid.filter((cell) => cell.isBomb);
 
@@ -158,6 +192,7 @@ function App(): React.JSX.Element {
     <Pressable
       key={cell.index}
       onPress={() => handleCellPress(cell, cell.index)}
+      onLongPress={() => toogleFlag(cell)}
       style={() => [
         styles.cell,
         {
@@ -175,7 +210,7 @@ function App(): React.JSX.Element {
       ]}
     >
       <Text style={[styles.cellText, { color: cell.pressed ? "#09090a" : "white" }]}>
-        {cell.pressed && cell.isBomb ? <BombIcon /> : <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>}
+        {cellText(cell)}
       </Text>
     </Pressable>
   )
