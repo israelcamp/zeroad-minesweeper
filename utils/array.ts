@@ -9,6 +9,7 @@ export type GridCell = {
     text: string;
     index: number;
     hasFlag: boolean;
+    color: string;
 };
 
 export type GridConfig = {
@@ -20,6 +21,17 @@ export type GridConfig = {
     columns: number;
     frequency: number;
 }
+
+const bombColors = {
+    0: "#e3dcdc",
+    1: "#346beb",
+    2: "#2A9D8F",
+    3: "#E9C46A",
+    4: "#8d07a8",  // Orange for '4'
+    5: "#82625a",  // Red-Orange for '5'
+    6: "#556d87",  // Purple for '6'
+    default: "#B0BEC5", // Gray for unknown cases
+};
 
 export const getGridConfig = (
     width: number,
@@ -66,6 +78,7 @@ export const generateGrid = (
                 pressed: false,
                 text: '',
                 hasFlag: false,
+                color: "black",
                 index
             });
             index++;
@@ -109,6 +122,7 @@ const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => 
         if (rowIndex < rows - 1 && colIndex < columns - 1 && grid[index + columns + 1].isBomb) bombsAround++;
 
         cell.bombsAround = bombsAround;
+        cell.color = bombColors[bombsAround] || bombColors.default;
     }
     return grid
 }

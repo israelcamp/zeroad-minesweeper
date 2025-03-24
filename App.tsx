@@ -27,17 +27,6 @@ const options = {
   ignoreAndroidSystemSettings: false,
 };
 
-const bombColors = {
-  0: "#e3dcdc",
-  1: "#346beb",
-  2: "#2A9D8F",
-  3: "#E9C46A",
-  4: "#8d07a8",  // Orange for '4'
-  5: "#82625a",  // Red-Orange for '5'
-  6: "#556d87",  // Purple for '6'
-  default: "#B0BEC5", // Gray for unknown cases
-};
-
 const emojis = {
   playing: '😃',
   victory: '😎',
@@ -94,7 +83,7 @@ function App(): React.JSX.Element {
     const bombs = state.grid.filter((cell) => cell.isBomb).length;
     const flags = state.grid.filter((cell) => cell.hasFlag).length;
     setRemainingBombs(Math.max(bombs - flags, 0));
-  }, [state]);
+  }, [state.grid]);
 
   const resetGame = () => {
     const updateState = {
@@ -211,7 +200,7 @@ function App(): React.JSX.Element {
           backgroundColor: cell.pressed
             ? cell.isBomb
               ? "#E63946" // Red for bombs
-              : bombColors[cell.bombsAround] || bombColors.default // Use mapped color or default
+              : cell.color // Use mapped color or default
             : "#B0BEC5", // Gray for unopened cells
           borderWidth: cell.pressed ? 0 : 0.5
         },
