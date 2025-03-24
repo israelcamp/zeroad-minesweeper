@@ -30,7 +30,7 @@ const bombColors = {
     4: "#8d07a8",  // Orange for '4'
     5: "#82625a",  // Red-Orange for '5'
     6: "#556d87",  // Purple for '6'
-    default: "#E63946", // Gray for unknown cases
+    default: "#a32227", // Gray for unknown cases
 };
 
 export const getGridConfig = (

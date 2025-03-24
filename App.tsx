@@ -157,7 +157,8 @@ function App(): React.JSX.Element {
     if (victory) {
       newState = endGameState(newState, emojis.victory);
     };
-    if (cell.isBomb) {
+    if (updatedCell.isBomb) {
+      updatedCell.color = "#FF4C4C"
       openBombs(newState.grid);
       newState = endGameState(newState, emojis.defeat);
     };
