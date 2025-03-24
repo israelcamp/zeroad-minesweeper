@@ -49,8 +49,6 @@ const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 
 function App(): React.JSX.Element {
 
-
-
   const { width, height } = getScreenSize();
   const safePadding = 0;
   const columns = 8;
@@ -197,16 +195,12 @@ function App(): React.JSX.Element {
           top: cell.y,
           width: cell.width,
           height: cell.height,
-          backgroundColor: cell.pressed
-            ? cell.isBomb
-              ? "#E63946" // Red for bombs
-              : cell.color // Use mapped color or default
-            : "#B0BEC5", // Gray for unopened cells
+          backgroundColor: cell.pressed ? cell.color : "#B0BEC5",
           borderWidth: cell.pressed ? 0 : 0.5
         },
       ]}
     >
-      <Text style={[styles.cellText, { color: cell.pressed ? "#09090a" : "white" }]}>
+      <Text style={styles.cellText}>
         {cellText(cell)}
       </Text>
     </Pressable>
