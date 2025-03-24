@@ -43,7 +43,8 @@ type GameState = {
 }
 
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
-const FlagIcon = () => <IconMaterial name="flag-triangle" size={28} color="black" />;
+const FlagIcon = () => <IconMaterial name="flag" size={28} color="black" />;
+const XIcon = () => <IconMaterial name="flag-remove" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 
@@ -166,6 +167,7 @@ function App(): React.JSX.Element {
   };
 
   const cellText = (cell: GridCell) => {
+    if (state.gameEnded && cell.hasFlag && !cell.isBomb) return <XIcon />;
     if (cell.hasFlag) return <FlagIcon />;
     if (cell.isBomb && cell.pressed) return <BombIcon />;
     return (
