@@ -15,6 +15,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
+import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
 import { trigger } from "react-native-haptic-feedback";
 
 import { getScreenSize } from './utils/dimension';
@@ -53,7 +54,7 @@ type GameState = {
 }
 
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
-const FlagIcon = () => <Icon name="flag" size={28} color="black" />;
+const FlagIcon = () => <IconMaterial name="flag-triangle" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 
