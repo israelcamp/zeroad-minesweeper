@@ -78,6 +78,7 @@ function App(): React.JSX.Element {
     elapsed: 0,
     emoji: emojis.playing,
   });
+  const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -87,6 +88,12 @@ function App(): React.JSX.Element {
       }
     }, 1000);
     return () => clearInterval(interval);
+  }, [state]);
+
+  useEffect(() => {
+    const bombs = state.grid.filter((cell) => cell.isBomb).length;
+    const flags = state.grid.filter((cell) => cell.hasFlag).length;
+    setRemainingBombs(Math.max(bombs - flags, 0));
   }, [state]);
 
   const resetGame = () => {
@@ -181,7 +188,7 @@ function App(): React.JSX.Element {
 
   const header = () => (
     <View style={styles.header}>
-      <Text style={styles.timer}>{state.elapsed}</Text>
+      <Text style={styles.timer}>{remainingBombs}</Text>
       <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
         <Text style={styles.emoji}>{state.emoji}</Text>
       </TouchableOpacity>
