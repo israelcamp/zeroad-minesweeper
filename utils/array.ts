@@ -9,7 +9,8 @@ export type GridCell = {
     text: string;
     index: number;
     hasFlag: boolean;
-    color: string;
+    textColor: string;
+    backgroundColor: string;
 };
 
 export type GridConfig = {
@@ -23,15 +24,21 @@ export type GridConfig = {
 }
 
 const bombColors = {
-    0: "#e3dcdc",
-    1: "#346beb",
-    2: "#2A9D8F",
-    3: "#E9C46A",
-    4: "#8d07a8",  // Orange for '4'
-    5: "#82625a",  // Red-Orange for '5'
-    6: "#556d87",  // Purple for '6'
-    default: "#a32227", // Gray for unknown cases
+    0: "#D3D3D3",  // Light Gray for empty cells
+    1: "#1976D2",  // Bright Blue
+    2: "#388E3C",  // Vibrant Green
+    3: "#F57C00",  // Deep Orange
+    4: "#7B1FA2",  // Strong Purple
+    5: "#D32F2F",  // Intense Red
+    6: "#00838F",  // Teal for '6'
+    default: "#000000", // Black for unknown cases
 };
+
+export const backgroundColors = {
+    default: "#B0BEC5",
+    pressed: "#e0dcdc",
+    openBomb: "#FF4C4C"
+}
 
 export const getGridConfig = (
     width: number,
@@ -78,7 +85,8 @@ export const generateGrid = (
                 pressed: false,
                 text: '',
                 hasFlag: false,
-                color: bombColors.default,
+                textColor: bombColors.default,
+                backgroundColor: backgroundColors.default,
                 index
             });
             index++;
@@ -122,7 +130,7 @@ const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => 
         if (rowIndex < rows - 1 && colIndex < columns - 1 && grid[index + columns + 1].isBomb) bombsAround++;
 
         cell.bombsAround = bombsAround;
-        cell.color = bombColors[bombsAround] || bombColors.default;
+        cell.textColor = bombColors[bombsAround] || bombColors.default;
     }
     return grid
 }
@@ -141,6 +149,7 @@ export const updateCellsAround = (index: number, grid: GridCell[], rows: number,
         if (!currentCell.isBomb) {
             currentCell.text = getCellText(currentCell);
             currentCell.pressed = true;
+            currentCell.backgroundColor = backgroundColors.pressed;
         }
         if (currentCell.bombsAround === 0) return updateCellsAround(index, grid, rows, columns);
     }
@@ -182,9 +191,10 @@ export const checkVictory = (grid: GridCell[]) => {
 
 export const openBombs = (grid: GridCell[]) => {
     for (const cell of grid) {
-        if (cell.isBomb) {
+        if (cell.isBomb && !cell.hasFlag) {
             cell.text = '💣';
             cell.pressed = true;
+            cell.backgroundColor = backgroundColors.pressed;
         }
     }
 }

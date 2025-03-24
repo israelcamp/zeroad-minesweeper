@@ -19,7 +19,7 @@ import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
 import { trigger } from "react-native-haptic-feedback";
 
 import { getScreenSize } from './utils/dimension';
-import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig, openBombs } from './utils/array';
+import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig, openBombs, backgroundColors } from './utils/array';
 
 // Optional configuration
 const options = {
@@ -147,7 +147,7 @@ function App(): React.JSX.Element {
     if (!newState.gameStarted) {
       newState = startGameState(newState);
     }
-    const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell) };
+    const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell), backgroundColor: backgroundColors.pressed };
     const newGrid = newState.grid.map((cell, i) =>
       i === index ? updatedCell : cell
     )
@@ -158,8 +158,8 @@ function App(): React.JSX.Element {
       newState = endGameState(newState, emojis.victory);
     };
     if (updatedCell.isBomb) {
-      updatedCell.color = "#FF4C4C"
       openBombs(newState.grid);
+      updatedCell.backgroundColor = backgroundColors.openBomb;
       newState = endGameState(newState, emojis.defeat);
     };
     setState(newState);
@@ -168,7 +168,12 @@ function App(): React.JSX.Element {
   const cellText = (cell: GridCell) => {
     if (cell.hasFlag) return <FlagIcon />;
     if (cell.isBomb && cell.pressed) return <BombIcon />;
-    return <Text style={styles.cellText}>{cell.pressed ? cell.text : ""}</Text>
+    return (
+      <Text
+        style={[styles.cellText, { color: cell.textColor }]}>
+        {cell.pressed ? cell.text : ""}
+      </Text>
+    )
   };
 
   const gridNotBomb = state.grid.filter((cell) => !cell.isBomb);
@@ -196,8 +201,8 @@ function App(): React.JSX.Element {
           top: cell.y,
           width: cell.width,
           height: cell.height,
-          backgroundColor: cell.pressed ? cell.color : "#B0BEC5",
-          borderWidth: cell.pressed ? 0 : 0.5
+          backgroundColor: cell.backgroundColor,
+          borderWidth: 0.5
         },
       ]}
     >
