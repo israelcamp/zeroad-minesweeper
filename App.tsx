@@ -132,7 +132,7 @@ function App(): React.JSX.Element {
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    vibrate(10);
+    vibrate(50);
     if (state.gameEnded) {
       return;
     }
@@ -155,6 +155,7 @@ function App(): React.JSX.Element {
       newState = endGameState(newState, emojis.victory);
     };
     if (updatedCell.isBomb) {
+      vibrate(1000);
       openBombs(newState.grid);
       updatedCell.backgroundColor = backgroundColors.openBomb;
       newState = endGameState(newState, emojis.defeat);
