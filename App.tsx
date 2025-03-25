@@ -11,21 +11,16 @@ import {
   Text,
   Alert,
   View,
+  Vibration,
   Pressable,
   TouchableOpacity
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
-import { trigger } from "react-native-haptic-feedback";
 
 import { getScreenSize } from './utils/dimension';
 import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig, openBombs, backgroundColors } from './utils/array';
 
-// Optional configuration
-const options = {
-  enableVibrateFallback: true,
-  ignoreAndroidSystemSettings: false,
-};
 
 const emojis = {
   playing: '😃',
@@ -114,7 +109,7 @@ function App(): React.JSX.Element {
   };
 
   const toogleFlag = (cell: GridCell) => {
-    trigger("impactMedium", options);
+    Vibration.vibrate(100);
     if (state.gameEnded) {
       return;
     }
@@ -136,7 +131,7 @@ function App(): React.JSX.Element {
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    trigger("impactLight", options);
+    Vibration.vibrate(10);
     if (state.gameEnded) {
       return;
     }
