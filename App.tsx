@@ -19,7 +19,17 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
 
 import { getScreenSize } from './utils/dimension';
-import { generateGrid, GridCell, updateCellsAround, checkVictory, getCellText, GridConfig, getGridConfig, openBombs, backgroundColors } from './utils/array';
+import {
+  generateGrid,
+  GridCell,
+  updateCellsAround,
+  checkVictory,
+  getCellText,
+  GridConfig,
+  getGridConfig,
+  openBombs,
+  backgroundColors
+} from './utils/array';
 
 
 const emojis = {
@@ -47,11 +57,13 @@ const vibrate = (duration: number) => Vibration.vibrate(duration);
 function App(): React.JSX.Element {
 
   const { width, height } = getScreenSize();
+  const headerHeight = 60;
+  const boardHeight = height - headerHeight;
   const safePadding = 0;
-  const columns = 8;
-  const frequency = 0.1;
+  const columns = 11;
+  const frequency = 0.17;
 
-  const gridConfig: GridConfig = getGridConfig(width, height, safePadding, columns, frequency);
+  const gridConfig: GridConfig = getGridConfig(width, boardHeight, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
 
   const [state, setState] = useState<GameState>({
@@ -179,7 +191,7 @@ function App(): React.JSX.Element {
   const gridBomb = state.grid.filter((cell) => cell.isBomb);
 
   const header = () => (
-    <View style={styles.header}>
+    <View style={[styles.header, { height: headerHeight }]}>
       <Text style={styles.timer}>{remainingBombs}</Text>
       <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
         <Text style={styles.emoji}>{state.emoji}</Text>
@@ -260,13 +272,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between", // Keeps the two timers apart
     alignItems: "center",
-    paddingTop: '5%',
+    paddingTop: '1%',
     paddingRight: '8%',
     paddingLeft: '8%',
-    paddingBottom: '1%',
     backgroundColor: "#264653",
     borderBottomColor: "black",
-    borderBottomWidth: 2,
+    borderBottomWidth: 2
   },
   timer: {
     fontSize: 34,
