@@ -42,6 +42,7 @@ const FlagIcon = () => <IconMaterial name="flag" size={28} color="black" />;
 const XIcon = () => <IconMaterial name="flag-remove" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
+const vibrate = (duration: number) => Vibration.vibrate(duration);
 
 function App(): React.JSX.Element {
 
@@ -109,7 +110,7 @@ function App(): React.JSX.Element {
   };
 
   const toogleFlag = (cell: GridCell) => {
-    Vibration.vibrate(100);
+    vibrate(100);
     if (state.gameEnded) {
       return;
     }
@@ -131,7 +132,7 @@ function App(): React.JSX.Element {
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    Vibration.vibrate(10);
+    vibrate(10);
     if (state.gameEnded) {
       return;
     }
