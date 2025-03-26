@@ -186,7 +186,7 @@ function App(): React.JSX.Element {
           width: cell.width,
           height: cell.height,
           backgroundColor: cell.backgroundColor,
-          borderTopWidth: 1,
+          borderBottomWidth: 1,
           borderRightWidth: 1,
           borderColor: "rgba(0, 0, 0, 0.5)", // Soft contrast
         },
