@@ -9,7 +9,6 @@ import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
-  Alert,
   View,
   Vibration,
   Pressable,
@@ -53,6 +52,17 @@ const XIcon = () => <IconMaterial name="flag-remove" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 const vibrate = (duration: number) => Vibration.vibrate(duration);
+const startGameState = (state: GameState) => ({
+  ...state,
+  gameStarted: true,
+  start: getTimestamp(),
+});
+const endGameState = (state: GameState, emoji: string) => ({
+  ...state,
+  gameStarted: false,
+  gameEnded: true,
+  emoji,
+});
 
 function App(): React.JSX.Element {
 
@@ -75,6 +85,9 @@ function App(): React.JSX.Element {
     emoji: emojis.playing,
   });
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
+
+  const gridNotBomb = state.grid.filter((cell) => !cell.isBomb);
+  const gridBomb = state.grid.filter((cell) => cell.isBomb);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -104,68 +117,44 @@ function App(): React.JSX.Element {
     setState({ ...state, ...updateState });
   }
 
-  const startGameState = (state: GameState) => {
-    return {
-      ...state,
-      gameStarted: true,
-      start: getTimestamp(),
-    };
-  };
-
-  const endGameState = (state: GameState, emoji: string) => {
-    return {
-      ...state,
-      gameStarted: false,
-      gameEnded: true,
-      emoji,
-    };
-  };
-
   const toogleFlag = (cell: GridCell) => {
     vibrate(100);
-    if (state.gameEnded) {
+    if (state.gameEnded)
       return;
-    }
+
     let newState = { ...state };
-    if (!newState.gameStarted) {
+    if (!newState.gameStarted)
       newState = startGameState(newState);
-    }
-    if (!cell.pressed) {
-      const newGrid = newState.grid.map((c) => {
-        if (c.index === cell.index) {
-          return { ...c, hasFlag: !c.hasFlag };
-        }
-        return c;
-      });
-      newState.grid = newGrid;
-    }
+
+    if (!cell.pressed)
+      newState.grid[cell.index] = { ...cell, hasFlag: !cell.hasFlag };
 
     setState({ ...newState });
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
     vibrate(50);
-    if (state.gameEnded) {
+    if (state.gameEnded || cell.hasFlag)
       return;
-    }
-    if (cell.hasFlag) {
-      return;
-    }
 
     let newState = { ...state };
-    if (!newState.gameStarted) {
+    if (!newState.gameStarted)
       newState = startGameState(newState);
-    }
-    const updatedCell = { ...cell, pressed: true, text: cell.isBomb ? '💣' : getCellText(cell), backgroundColor: backgroundColors.pressed };
-    const newGrid = newState.grid.map((cell, i) =>
-      i === index ? updatedCell : cell
-    )
+
+    const updatedCell = {
+      ...cell,
+      pressed: true,
+      text: getCellText(cell),
+      backgroundColor: backgroundColors.pressed
+    };
+    const newGrid = newState.grid
+    newGrid[index] = updatedCell;
+
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
     newState.grid = newGrid;
     const victory = checkVictory(newGrid);
-    if (victory) {
+    if (victory)
       newState = endGameState(newState, emojis.victory);
-    };
     if (updatedCell.isBomb) {
       vibrate(1000);
       openBombs(newState.grid);
@@ -187,19 +176,6 @@ function App(): React.JSX.Element {
     )
   };
 
-  const gridNotBomb = state.grid.filter((cell) => !cell.isBomb);
-  const gridBomb = state.grid.filter((cell) => cell.isBomb);
-
-  const header = () => (
-    <View style={[styles.header, { height: headerHeight }]}>
-      <Text style={styles.timer}>{remainingBombs}</Text>
-      <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
-        <Text style={styles.emoji}>{state.emoji}</Text>
-      </TouchableOpacity>
-      <Text style={styles.timer}>{state.elapsed}</Text>
-    </View>
-  );
-
   const displayCell = (cell: GridCell) => (
     <Pressable
       key={cell.index}
@@ -217,11 +193,9 @@ function App(): React.JSX.Element {
         },
       ]}
     >
-      <Text style={styles.cellText}>
-        {cellText(cell)}
-      </Text>
+      {cellText(cell)}
     </Pressable>
-  )
+  );
 
   const gridView = () => (
     <View style={styles.grid}>
@@ -229,6 +203,16 @@ function App(): React.JSX.Element {
       {gridBomb.map(cell => displayCell(cell))}
     </View>
   )
+
+  const header = () => (
+    <View style={[styles.header, { height: headerHeight }]}>
+      <Text style={styles.timer}>{remainingBombs}</Text>
+      <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
+        <Text style={styles.emoji}>{state.emoji}</Text>
+      </TouchableOpacity>
+      <Text style={styles.timer}>{state.elapsed}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>

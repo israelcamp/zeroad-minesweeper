@@ -64,7 +64,7 @@ export const getGridConfig = (
     }
 }
 
-export const getCellText = (cell: GridCell) => (cell.bombsAround > 0 ? cell.bombsAround.toString() : "");
+export const getCellText = (cell: GridCell) => (cell.isBomb ? '💣' : cell.bombsAround > 0 ? cell.bombsAround.toString() : "");
 
 export const generateGrid = (
     gridConfig: GridConfig
