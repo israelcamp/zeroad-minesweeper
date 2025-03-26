@@ -86,9 +86,6 @@ function App(): React.JSX.Element {
   });
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
 
-  const gridNotBomb = state.grid.filter((cell) => !cell.isBomb);
-  const gridBomb = state.grid.filter((cell) => cell.isBomb);
-
   useEffect(() => {
     const interval = setInterval(() => {
       if (state.gameStarted) {
@@ -189,7 +186,9 @@ function App(): React.JSX.Element {
           width: cell.width,
           height: cell.height,
           backgroundColor: cell.backgroundColor,
-          borderWidth: 0.5
+          borderTopWidth: 1,
+          borderRightWidth: 1,
+          borderColor: "rgba(0, 0, 0, 0.5)", // Soft contrast
         },
       ]}
     >
@@ -199,8 +198,7 @@ function App(): React.JSX.Element {
 
   const gridView = () => (
     <View style={styles.grid}>
-      {gridNotBomb.map(cell => displayCell(cell))}
-      {gridBomb.map(cell => displayCell(cell))}
+      {state.grid.map(cell => displayCell(cell))}
     </View>
   )
 
