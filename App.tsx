@@ -32,9 +32,11 @@ import {
 
 
 const emojis = {
-  playing: '😃',
-  victory: '😎',
-  defeat: '😵'
+  playing: '🧐',
+  idle: '🤓',
+  victory: '🙄',
+  defeat: '😬',
+  waiting: '😪'
 }
 
 type GameState = {
@@ -56,6 +58,7 @@ const startGameState = (state: GameState) => ({
   ...state,
   gameStarted: true,
   start: getTimestamp(),
+  emoji: emojis.playing,
 });
 const endGameState = (state: GameState, emoji: string) => ({
   ...state,
@@ -71,7 +74,7 @@ function App(): React.JSX.Element {
   const boardHeight = height - headerHeight;
   const safePadding = 0;
   const columns = 11;
-  const frequency = 0.17;
+  const frequency = 0.15;
 
   const gridConfig: GridConfig = getGridConfig(width, boardHeight, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
@@ -82,7 +85,7 @@ function App(): React.JSX.Element {
     grid: resetGrid(),
     start: getTimestamp(),
     elapsed: 0,
-    emoji: emojis.playing,
+    emoji: emojis.idle,
   });
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
 
@@ -202,6 +205,42 @@ function App(): React.JSX.Element {
     </View>
   )
 
+  const rectangle = () => (
+    <View style={{ alignItems: 'center', position: 'absolute', top: 45, left: '50%', transform: [{ translateX: -75 }] }}>
+      {/* Triangle (Speech Tail) */}
+      <View style={{
+        width: 0,
+        height: 0,
+        borderLeftWidth: 10,
+        borderRightWidth: 10,
+        borderBottomWidth: 15,
+        borderLeftColor: "transparent",
+        borderRightColor: "transparent",
+        borderBottomColor: "white",
+        alignSelf: 'center'
+      }} />
+
+      {/* Speech Bubble */}
+      <View style={{
+        width: 150,
+        padding: 10,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        alignItems: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+      }}>
+        <Text style={{ textAlign: 'center' }}>
+          {state.emoji === emojis.victory ? "Congratulations..." : "Better luck next time!"}
+
+        </Text>
+      </View>
+    </View >
+  );
+
   const header = () => (
     <View style={[styles.header, { height: headerHeight }]}>
       <Text style={styles.timer}>{remainingBombs}</Text>
@@ -216,6 +255,7 @@ function App(): React.JSX.Element {
     <View style={styles.container}>
       {header()}
       {gridView()}
+      {state.gameEnded ? rectangle() : <></>}
     </View >
   );
 }
