@@ -44,8 +44,10 @@ type GameState = {
   gameEnded: boolean,
   grid: GridCell[],
   start: number,
+  lastPlay: number,
   elapsed: number,
   emoji: string,
+  elapsedTimeSinceLastPlay: number
 }
 
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
@@ -84,7 +86,9 @@ function App(): React.JSX.Element {
     gameEnded: false,
     grid: resetGrid(),
     start: getTimestamp(),
+    lastPlay: getTimestamp(),
     elapsed: 0,
+    elapsedTimeSinceLastPlay: 0,
     emoji: emojis.idle,
   });
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
@@ -92,8 +96,11 @@ function App(): React.JSX.Element {
   useEffect(() => {
     const interval = setInterval(() => {
       if (state.gameStarted) {
-        const elapsed = getSecondsDiff(getTimestamp(), state.start);
-        setState({ ...state, elapsed });
+        const timestamp = getTimestamp();
+        const elapsed = getSecondsDiff(timestamp, state.start);
+        const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
+        const emoji = elapsedTimeSinceLastPlay > 5 ? emojis.waiting : emojis.playing;
+        setState({ ...state, elapsed, elapsedTimeSinceLastPlay, emoji });
       }
     }, 1000);
     return () => clearInterval(interval);
@@ -161,6 +168,8 @@ function App(): React.JSX.Element {
       updatedCell.backgroundColor = backgroundColors.openBomb;
       newState = endGameState(newState, emojis.defeat);
     };
+
+    newState.lastPlay = getTimestamp();
     setState(newState);
   };
 
