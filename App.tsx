@@ -105,7 +105,10 @@ function App(): React.JSX.Element {
         const timestamp = getTimestamp();
         const elapsed = getSecondsDiff(timestamp, state.start);
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
-        const emoji = elapsedTimeSinceLastPlay > 5 ? showSlider ? emojis.slider : emojis.waiting : emojis.playing;
+
+        let emoji = emojis.playing;
+        if (showSlider) emoji = emojis.slider;
+        else if (elapsedTimeSinceLastPlay > 5) emoji = emojis.waiting;
         setState({ ...state, elapsed, elapsedTimeSinceLastPlay, emoji });
       }
     }, 1000);
@@ -148,7 +151,7 @@ function App(): React.JSX.Element {
 
   const handleCellPress = (cell: GridCell, index: number) => {
     vibrate(50);
-    if (state.gameEnded || cell.hasFlag)
+    if (state.gameEnded || cell.hasFlag || showSlider)
       return;
 
     let newState = { ...state };
