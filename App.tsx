@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
+import IconEvil from "react-native-vector-icons/EvilIcons";
+import Slider from '@react-native-community/slider';
 
 import { getScreenSize } from './utils/dimension';
 import {
@@ -33,10 +35,11 @@ import {
 
 const emojis = {
   playing: '🧐',
-  idle: '🤓',
+  idle: '😑',
   victory: '🙄',
   defeat: '😬',
-  waiting: '😪'
+  waiting: '😪',
+  slider: '🥸'
 }
 
 type GameState = {
@@ -76,7 +79,10 @@ function App(): React.JSX.Element {
   const boardHeight = height - headerHeight;
   const safePadding = 0;
   const columns = 11;
-  const frequency = 0.15;
+  const presetFrequency = 0.15;
+
+  const [frequency, setFrequency] = useState<number>(presetFrequency);
+  const [showSlider, setShowSlider] = useState<boolean>(false);
 
   const gridConfig: GridConfig = getGridConfig(width, boardHeight, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
@@ -99,7 +105,7 @@ function App(): React.JSX.Element {
         const timestamp = getTimestamp();
         const elapsed = getSecondsDiff(timestamp, state.start);
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
-        const emoji = elapsedTimeSinceLastPlay > 5 ? emojis.waiting : emojis.playing;
+        const emoji = elapsedTimeSinceLastPlay > 5 ? showSlider ? emojis.slider : emojis.waiting : emojis.playing;
         setState({ ...state, elapsed, elapsedTimeSinceLastPlay, emoji });
       }
     }, 1000);
@@ -119,8 +125,9 @@ function App(): React.JSX.Element {
       grid: resetGrid(),
       start: getTimestamp(),
       elapsed: 0,
-      emoji: emojis.playing,
+      emoji: emojis.idle,
     };
+    setShowSlider(false);
     setState({ ...state, ...updateState });
   }
 
@@ -173,6 +180,11 @@ function App(): React.JSX.Element {
     setState(newState);
   };
 
+  const setSliderTrue = () => {
+    setShowSlider(true);
+    setState({ ...state, emoji: emojis.slider });
+  }
+
   const cellText = (cell: GridCell) => {
     if (state.gameEnded && cell.hasFlag && !cell.isBomb) return <XIcon />;
     if (cell.hasFlag) return <FlagIcon />;
@@ -214,7 +226,7 @@ function App(): React.JSX.Element {
     </View>
   )
 
-  const rectangle = () => (
+  const messageBubble = (message: string) => (
     <View style={{ alignItems: 'center', position: 'absolute', top: 45, left: '50%', transform: [{ translateX: -75 }] }}>
       {/* Triangle (Speech Tail) */}
       <View style={{
@@ -243,17 +255,55 @@ function App(): React.JSX.Element {
         elevation: 5,
       }}>
         <Text style={{ textAlign: 'center' }}>
-          {state.emoji === emojis.victory ? "Congratulations..." : "Better luck next time!"}
-
+          {message}
         </Text>
       </View>
     </View >
   );
 
+  const slider = () => (
+    <>
+      {messageBubble("Tap me to comeback!")}
+      <View style={{
+        padding: 15,
+        position: 'absolute',
+        top: 130,
+        left: '50%',
+        transform: [{ translateX: -125 }],
+        backgroundColor: 'white'
+      }}>
+        <Text style={{ textAlign: 'center' }}>
+          Bombs Frequency {gridConfig.frequency.toFixed(2)}
+        </Text>
+
+        {/* Row container for Slider + Icon */}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Slider
+            style={{ width: 180, height: 40 }}
+            step={0.01}
+            minimumValue={0}
+            maximumValue={1}
+            onValueChange={setFrequency}
+            value={gridConfig.frequency}
+            minimumTrackTintColor="#000000"
+            maximumTrackTintColor="#000000"
+          />
+          <IconEvil
+            name="undo"
+            size={28}
+            color="black"
+            onPress={() => setFrequency(presetFrequency)}
+            style={{ marginLeft: 10, marginBottom: 5 }}
+          />
+        </View>
+      </View>
+    </>
+  );
+
   const header = () => (
     <View style={[styles.header, { height: headerHeight }]}>
       <Text style={styles.timer}>{remainingBombs}</Text>
-      <TouchableOpacity onPress={resetGame} style={styles.emojiButton}>
+      <TouchableOpacity onPress={resetGame} onLongPress={setSliderTrue} style={styles.emojiButton}>
         <Text style={styles.emoji}>{state.emoji}</Text>
       </TouchableOpacity>
       <Text style={styles.timer}>{state.elapsed}</Text>
@@ -264,7 +314,8 @@ function App(): React.JSX.Element {
     <View style={styles.container}>
       {header()}
       {gridView()}
-      {state.gameEnded ? rectangle() : <></>}
+      {state.gameEnded ? messageBubble(state.emoji === emojis.victory ? "Congratulations..." : "Better luck next time!") : <></>}
+      {showSlider ? slider() : <></>}
     </View >
   );
 }
