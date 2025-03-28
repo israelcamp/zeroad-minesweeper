@@ -35,7 +35,7 @@ import {
 
 const emojis = {
   playing: '🧐',
-  idle: '😑',
+  idle: '😃',
   victory: '🙄',
   defeat: '😬',
   waiting: '😪',
