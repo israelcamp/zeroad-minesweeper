@@ -122,6 +122,10 @@ function App(): React.JSX.Element {
   }, [state.grid]);
 
   const resetGame = () => {
+    if (showSlider && gridConfig.frequency === frequency) {
+      setShowSlider(false);
+      return;
+    }
     const updateState = {
       gameStarted: false,
       gameEnded: false,
