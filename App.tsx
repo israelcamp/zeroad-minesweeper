@@ -126,6 +126,17 @@ function App(): React.JSX.Element {
     resetGame();
   }, [gridConfig]);
 
+  useEffect(() => {
+    if (showSlider) {
+      setState({ ...state, emoji: emojis.slider });
+    } else if (state.gameStarted) {
+      setState({ ...state, emoji: emojis.playing });
+    }
+    else {
+      setState({ ...state, emoji: emojis.idle });
+    }
+  }, [showSlider]);
+
   const resetGame = () => {
     if (showSlider) {
       setShowSlider(false);
@@ -194,7 +205,6 @@ function App(): React.JSX.Element {
 
   const setSliderTrue = () => {
     setShowSlider(true);
-    setState({ ...state, emoji: emojis.slider });
   }
 
   const cellText = (cell: GridCell) => {
