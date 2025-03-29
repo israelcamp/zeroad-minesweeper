@@ -54,6 +54,7 @@ type GameState = {
   elapsedTimeSinceLastPlay: number
 }
 
+const noop = () => { };
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
 const FlagIcon = () => <IconMaterial name="flag" size={28} color="black" />;
 const XIcon = () => <IconMaterial name="flag-remove" size={28} color="black" />;
@@ -82,6 +83,7 @@ function App(): React.JSX.Element {
   const columns = 11;
   const presetFrequency = 0.10;
 
+  const [frequency, setFrequency] = useState<number>(presetFrequency);
   const [gridConfig, setGridConfig] = useState<GridConfig>(getGridConfig(width, boardHeight, safePadding, columns, presetFrequency));
   const [showSlider, setShowSlider] = useState<boolean>(false);
   const resetGrid = () => generateGrid(gridConfig);
@@ -119,6 +121,10 @@ function App(): React.JSX.Element {
     const flags = state.grid.filter((cell) => cell.hasFlag).length;
     setRemainingBombs(Math.max(bombs - flags, 0));
   }, [state.grid]);
+
+  useEffect(() => {
+    resetGame();
+  }, [gridConfig]);
 
   const resetGame = () => {
     if (showSlider) {
@@ -284,11 +290,11 @@ function App(): React.JSX.Element {
           </Text>
         </View>
         <Text style={{ textAlign: 'center', fontSize: 18, paddingTop: 10 }}>
-          {(gridConfig.frequency * 100).toFixed(0)}%
+          {(frequency * 100).toFixed(0)}%
         </Text>
         {/* Row container for Slider + Icon */}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => setGridConfig({ ...gridConfig, frequency: Math.max(gridConfig.frequency - 0.01, 0.1) })}>
+          <TouchableOpacity onPress={() => setFrequency(prevFrequency => Math.max(prevFrequency - 0.01, 0.1))}>
             <IconAnt
               name="minus"
               size={20}
@@ -301,13 +307,13 @@ function App(): React.JSX.Element {
             step={0.01}
             minimumValue={0}
             maximumValue={1}
-            onValueChange={(value) => setGridConfig({ ...gridConfig, frequency: value })}
-            value={gridConfig.frequency}
+            onValueChange={(value) => setFrequency(value)}
+            value={frequency}
             minimumTrackTintColor='green'
             maximumTrackTintColor="#000000"
 
           />
-          <TouchableOpacity onPress={() => setGridConfig({ ...gridConfig, frequency: Math.min(gridConfig.frequency + 0.01, 1) })}>
+          <TouchableOpacity onPress={() => setFrequency(prevFrequency => Math.min(prevFrequency + 0.01, 1))}>
             <IconAnt
               name="plus"
               size={20}
@@ -317,7 +323,7 @@ function App(): React.JSX.Element {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
-          onPress={resetGame}
+          onPress={() => setGridConfig({ ...gridConfig, frequency })}
           style={{
             backgroundColor: '#007AFF', // Professional "Apply" blue
             paddingVertical: 10,
@@ -373,7 +379,7 @@ function App(): React.JSX.Element {
   const header = () => (
     <View style={[styles.header, { height: headerHeight }]}>
       <Text style={styles.timer}>{remainingBombs}</Text>
-      <TouchableOpacity onPress={resetGame} onLongPress={setSliderTrue} style={styles.emojiButton}>
+      <TouchableOpacity onPress={() => showSlider ? noop() : resetGame()} onLongPress={setSliderTrue} style={styles.emojiButton}>
         <Text style={styles.emoji}>{state.emoji}</Text>
       </TouchableOpacity>
       <Text style={styles.timer}>{state.elapsed}</Text>
