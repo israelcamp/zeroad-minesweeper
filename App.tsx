@@ -358,6 +358,10 @@ function App(): React.JSX.Element {
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
+          onPress={() => {
+            setShowSlider(false);
+            setFrequency(gridConfig.frequency);
+          }}
           style={{
             backgroundColor: '#FF3B30', // Professional "Cancel" red
             paddingVertical: 10,
