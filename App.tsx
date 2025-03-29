@@ -17,6 +17,7 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
 import IconEvil from "react-native-vector-icons/EvilIcons";
+import IconAnt from "react-native-vector-icons/AntDesign";
 import Slider from '@react-native-community/slider';
 
 import { getScreenSize } from './utils/dimension';
@@ -79,12 +80,10 @@ function App(): React.JSX.Element {
   const boardHeight = height - headerHeight;
   const safePadding = 0;
   const columns = 11;
-  const presetFrequency = 0.15;
+  const presetFrequency = 0.10;
 
-  const [frequency, setFrequency] = useState<number>(presetFrequency);
+  const [gridConfig, setGridConfig] = useState<GridConfig>(getGridConfig(width, boardHeight, safePadding, columns, presetFrequency));
   const [showSlider, setShowSlider] = useState<boolean>(false);
-
-  const gridConfig: GridConfig = getGridConfig(width, boardHeight, safePadding, columns, frequency);
   const resetGrid = () => generateGrid(gridConfig);
 
   const [state, setState] = useState<GameState>({
@@ -122,10 +121,10 @@ function App(): React.JSX.Element {
   }, [state.grid]);
 
   const resetGame = () => {
-    if (showSlider && gridConfig.frequency === frequency) {
+    if (showSlider) {
       setShowSlider(false);
-      return;
     }
+
     const updateState = {
       gameStarted: false,
       gameEnded: false,
@@ -276,32 +275,47 @@ function App(): React.JSX.Element {
         position: 'absolute',
         top: 130,
         left: '50%',
-        transform: [{ translateX: -125 }],
-        backgroundColor: 'white'
+        transform: [{ translateX: -145 }],
+        backgroundColor: 'white',
+        borderRadius: 10,
       }}>
-        <Text style={{ textAlign: 'center' }}>
-          Bombs Frequency {gridConfig.frequency.toFixed(2)}
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={{ flex: 1, textAlign: 'center', fontSize: 18 }}>
+            Bombs Frequency
+          </Text>
+        </View>
+        <Text style={{ textAlign: 'center', fontSize: 18, paddingTop: 10 }}>
+          {(gridConfig.frequency * 100).toFixed(0)}%
         </Text>
-
         {/* Row container for Slider + Icon */}
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <TouchableOpacity onPress={() => setGridConfig({ ...gridConfig, frequency: Math.max(gridConfig.frequency - 0.01, 0.1) })}>
+            <IconAnt
+              name="minus"
+              size={20}
+              color="black"
+              style={{ marginLeft: 10, marginBottom: 3 }}
+            />
+          </TouchableOpacity>
           <Slider
-            style={{ width: 180, height: 40 }}
+            style={{ width: 200, height: 80, padding: 0 }}
             step={0.01}
             minimumValue={0}
             maximumValue={1}
-            onValueChange={setFrequency}
+            onValueChange={(value) => setGridConfig({ ...gridConfig, frequency: value })}
             value={gridConfig.frequency}
-            minimumTrackTintColor="#000000"
+            minimumTrackTintColor='green'
             maximumTrackTintColor="#000000"
+
           />
-          <IconEvil
-            name="undo"
-            size={28}
-            color="black"
-            onPress={() => setFrequency(presetFrequency)}
-            style={{ marginLeft: 10, marginBottom: 5 }}
-          />
+          <TouchableOpacity onPress={() => setGridConfig({ ...gridConfig, frequency: Math.min(gridConfig.frequency + 0.01, 1) })}>
+            <IconAnt
+              name="plus"
+              size={20}
+              color="black"
+              style={{ marginLeft: 10, marginBottom: 3 }}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </>
