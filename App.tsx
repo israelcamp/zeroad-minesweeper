@@ -269,11 +269,10 @@ function App(): React.JSX.Element {
 
   const slider = () => (
     <>
-      {messageBubble("Tap me to comeback!")}
       <View style={{
         padding: 15,
         position: 'absolute',
-        top: 130,
+        top: 80,
         left: '50%',
         transform: [{ translateX: -145 }],
         backgroundColor: 'white',
@@ -317,6 +316,56 @@ function App(): React.JSX.Element {
             />
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          onPress={resetGame}
+          style={{
+            backgroundColor: '#007AFF', // Professional "Apply" blue
+            paddingVertical: 10,
+            paddingHorizontal: 20,
+            borderRadius: 8, // Rounded corners
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 3, // For Android shadow
+          }}
+        >
+          <Text style={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: 'bold',
+            textTransform: 'uppercase', // Makes text look cleaner
+          }}>
+            APPLY
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#FF3B30', // Professional "Cancel" red
+            paddingVertical: 10,
+            marginTop: 5,
+            paddingHorizontal: 20,
+            borderRadius: 8, // Rounded corners
+            alignItems: 'center',
+            justifyContent: 'center',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 3, // For Android shadow
+          }}
+        >
+          <Text style={{
+            color: 'white',
+            fontSize: 16,
+            fontWeight: 'bold',
+            textTransform: 'uppercase', // Makes text look cleaner
+          }}>
+            Cancel
+          </Text>
+        </TouchableOpacity>
       </View>
     </>
   );
