@@ -16,9 +16,11 @@ import {
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
-import IconEvil from "react-native-vector-icons/EvilIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import Slider from '@react-native-community/slider';
+import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
+import MMKV from "react-native-mmkv-storage";
+
 
 import { getScreenSize } from './utils/dimension';
 import {
@@ -74,6 +76,8 @@ const endGameState = (state: GameState, emoji: string) => ({
   emoji,
 });
 
+const storage = new MMKVLoader().initialize();
+
 function App(): React.JSX.Element {
 
   const { width, height } = getScreenSize();
@@ -81,10 +85,11 @@ function App(): React.JSX.Element {
   const boardHeight = height - headerHeight;
   const safePadding = 0;
   const columns = 11;
-  const presetFrequency = 0.10;
+  const presetFrequency = 0.1;
+  const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
   const [frequency, setFrequency] = useState<number>(presetFrequency);
-  const [gridConfig, setGridConfig] = useState<GridConfig>(getGridConfig(width, boardHeight, safePadding, columns, presetFrequency));
+  const [gridConfig, setGridConfig] = useState<GridConfig>(presetGridConfig);
   const [showSlider, setShowSlider] = useState<boolean>(false);
   const resetGrid = () => generateGrid(gridConfig);
 
@@ -99,6 +104,23 @@ function App(): React.JSX.Element {
     emoji: emojis.idle,
   });
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchInitialFrequency = async () => {
+      const initialFrequency = await storage.getIntAsync('frequency');
+      if (initialFrequency) {
+        setFrequency(initialFrequency);
+        setGridConfig({ ...gridConfig, frequency: initialFrequency });
+      } else {
+        storage.setIntAsync('frequency', presetFrequency);
+      }
+    }
+    fetchInitialFrequency();
+  }, []);
+
+  useEffect(() => {
+    storage.setIntAsync('frequency', frequency);
+  }, [gridConfig.frequency]);
 
   useEffect(() => {
     const interval = setInterval(() => {
