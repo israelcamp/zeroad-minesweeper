@@ -18,9 +18,7 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import Slider from '@react-native-community/slider';
-import { MMKVLoader, useMMKVStorage } from 'react-native-mmkv-storage';
-import MMKV from "react-native-mmkv-storage";
-
+import { MMKVLoader } from 'react-native-mmkv-storage';
 
 import { getScreenSize } from './utils/dimension';
 import {
