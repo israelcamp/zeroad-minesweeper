@@ -415,7 +415,7 @@ function App(): React.JSX.Element {
       <TouchableOpacity onPress={() => showSlider ? noop() : resetGame()} onLongPress={setSliderTrue} style={styles.emojiButton}>
         <Text style={styles.emoji}>{state.emoji}</Text>
       </TouchableOpacity>
-      <Text style={styles.timer}>{state.elapsed}</Text>
+      <Text style={styles.timer}>{Math.min(state.elapsed, 999)}</Text>
     </View>
   );
 
