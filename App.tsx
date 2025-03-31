@@ -19,6 +19,7 @@ import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
 import IconAnt from "react-native-vector-icons/AntDesign";
 import Slider from '@react-native-community/slider';
 import { MMKVLoader } from 'react-native-mmkv-storage';
+import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import { getScreenSize } from './utils/dimension';
 import {
@@ -77,6 +78,7 @@ const endGameState = (state: GameState, emoji: string) => ({
 const storage = new MMKVLoader().initialize();
 
 function App(): React.JSX.Element {
+  useKeepAwake();
 
   const { width, height } = getScreenSize();
   const headerHeight = 60;
