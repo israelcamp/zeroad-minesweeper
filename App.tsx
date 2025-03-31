@@ -414,9 +414,14 @@ function App(): React.JSX.Element {
   const header = () => (
     <View style={[styles.header, { height: headerHeight }]}>
       <Text style={styles.timer}>{remainingBombs}</Text>
-      <TouchableOpacity onPress={() => showSlider ? noop() : resetGame()} onLongPress={setSliderTrue} style={styles.emojiButton}>
-        <Text style={styles.emoji}>{state.emoji}</Text>
-      </TouchableOpacity>
+      <View style={styles.emojiButton}>
+        <TouchableOpacity onPress={() => showSlider ? noop() : resetGame()}>
+          <Text style={styles.emoji}>{state.emoji}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={setSliderTrue}>
+          <Icon name="gear" size={28} color="gray" />
+        </TouchableOpacity>
+      </View>
       <Text style={styles.timer}>{Math.min(state.elapsed, 999)}</Text>
     </View>
   );
@@ -480,6 +485,10 @@ const styles = StyleSheet.create({
   },
   emojiButton: {
     flex: 1, // Takes up remaining space
+    flexDirection: "row",
+    marginLeft: 56,
+    gap: 30,
+    justifyContent: "center", // Centers the emoji vertically
     alignItems: "center", // Centers the emoji horizontally
   },
   emoji: {
