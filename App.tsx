@@ -175,10 +175,9 @@ function App(): React.JSX.Element {
   }
 
   const toogleFlag = (cell: GridCell) => {
-    vibrate(100);
     if (state.gameEnded)
       return;
-
+    vibrate(100);
     let newState = { ...state };
     if (!newState.gameStarted)
       newState = startGameState(newState);
@@ -190,9 +189,9 @@ function App(): React.JSX.Element {
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    vibrate(50);
     if (state.gameEnded || cell.hasFlag || showSlider)
       return;
+    vibrate(50);
 
     let newState = { ...state };
     if (!newState.gameStarted)
