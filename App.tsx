@@ -335,7 +335,7 @@ function App(): React.JSX.Element {
           <Slider
             style={{ width: 200, height: 80, padding: 0 }}
             step={0.01}
-            minimumValue={0}
+            minimumValue={0.1}
             maximumValue={1}
             onValueChange={(value) => setFrequency(value)}
             value={frequency}
