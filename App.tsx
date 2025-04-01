@@ -66,6 +66,7 @@ const startGameState = (state: GameState) => ({
   ...state,
   gameStarted: true,
   start: getTimestamp(),
+  lastPlay: getTimestamp(),
   emoji: emojis.playing,
 });
 const endGameState = (state: GameState, emoji: string) => ({
@@ -120,7 +121,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     storage.setIntAsync('frequency', frequency);
-  }, [gridConfig.frequency]);
+  }, [gridConfig]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -142,7 +143,7 @@ function App(): React.JSX.Element {
     const bombs = state.grid.filter((cell) => cell.isBomb).length;
     const flags = state.grid.filter((cell) => cell.hasFlag).length;
     setRemainingBombs(Math.max(bombs - flags, 0));
-  }, [state.grid]);
+  }, [state]);
 
   useEffect(() => {
     resetGame();
@@ -179,7 +180,9 @@ function App(): React.JSX.Element {
   const toogleFlag = (cell: GridCell) => {
     if (state.gameEnded)
       return;
+
     vibrate(100);
+
     let newState = { ...state };
     if (!newState.gameStarted)
       newState = startGameState(newState);
