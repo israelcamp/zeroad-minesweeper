@@ -480,13 +480,13 @@ const styles = StyleSheet.create({
   timer: {
     fontSize: 34,
     color: "white",
-    width: 60, // Ensures equal spacing on both sides
+    width: '20%', // Ensures equal spacing on both sides
     textAlign: "center",
   },
   emojiButton: {
     flex: 1, // Takes up remaining space
     flexDirection: "row",
-    marginLeft: 56,
+    marginLeft: "16%",
     gap: 30,
     justifyContent: "center", // Centers the emoji vertically
     alignItems: "center", // Centers the emoji horizontally
