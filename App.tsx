@@ -91,7 +91,7 @@ function App(): React.JSX.Element {
 
   const [frequency, setFrequency] = useState<number>(presetFrequency);
   const [gridConfig, setGridConfig] = useState<GridConfig>(presetGridConfig);
-  const [showSlider, setShowSlider] = useState<boolean>(false);
+  const [showSlider, setShowSlider] = useState<boolean>(true);
   const resetGrid = () => generateGrid(gridConfig);
 
   const [state, setState] = useState<GameState>({
@@ -320,7 +320,7 @@ function App(): React.JSX.Element {
       }}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ flex: 1, textAlign: 'center', fontSize: 18 }}>
-            Bombs Frequency
+            Bombs Probability
           </Text>
         </View>
         <Text style={{ textAlign: 'center', fontSize: 18, paddingTop: 10 }}>
@@ -354,6 +354,83 @@ function App(): React.JSX.Element {
               color="black"
               style={{ marginLeft: 10, marginBottom: 3 }}
             />
+          </TouchableOpacity>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 10 }}>
+          <TouchableOpacity
+            onPress={() => setFrequency(0.1)}
+            style={{
+              backgroundColor: '#27AE60', // Professional "Apply" blue
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 8, // Rounded corners
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 3, // For Android shadow
+            }}
+          >
+            <Text style={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 'bold',
+              textTransform: 'uppercase', // Makes text look cleaner
+            }}>
+              EASY
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setFrequency(0.15)}
+            style={{
+              backgroundColor: '#E67E22', // Professional "Apply" blue
+              paddingVertical: 10,
+              paddingHorizontal: 10,
+              borderRadius: 8, // Rounded corners
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 3, // For Android shadow
+            }}
+          >
+            <Text style={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 'bold',
+              textTransform: 'uppercase', // Makes text look cleaner
+            }}>
+              MEDIUM
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => setFrequency(0.2)}
+            style={{
+              backgroundColor: '#C0392B', // Professional "Apply" blue
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              borderRadius: 8, // Rounded corners
+              alignItems: 'center',
+              justifyContent: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 3, // For Android shadow
+            }}
+          >
+            <Text style={{
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 'bold',
+              textTransform: 'uppercase', // Makes text look cleaner
+            }}>
+              HARD
+            </Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity
