@@ -359,102 +359,34 @@ function App(): React.JSX.Element {
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 10 }}>
           <TouchableOpacity
             onPress={() => setFrequency(0.1)}
-            style={{
-              backgroundColor: '#27AE60', // Professional "Apply" blue
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              borderRadius: 8, // Rounded corners
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 3, // For Android shadow
-            }}
+            style={[styles.sliderButton, { backgroundColor: '#27AE60' }]}
           >
-            <Text style={{
-              color: 'white',
-              fontSize: 16,
-              fontWeight: 'bold',
-              textTransform: 'uppercase', // Makes text look cleaner
-            }}>
+            <Text style={styles.sliderButtonText}>
               EASY
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setFrequency(0.15)}
-            style={{
-              backgroundColor: '#E67E22', // Professional "Apply" blue
-              paddingVertical: 10,
-              paddingHorizontal: 10,
-              borderRadius: 8, // Rounded corners
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 3, // For Android shadow
-            }}
+            style={[styles.sliderButton, { backgroundColor: '#E67E22' }]}
           >
-            <Text style={{
-              color: 'white',
-              fontSize: 16,
-              fontWeight: 'bold',
-              textTransform: 'uppercase', // Makes text look cleaner
-            }}>
+            <Text style={styles.sliderButtonText}>
               MEDIUM
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => setFrequency(0.2)}
-            style={{
-              backgroundColor: '#C0392B', // Professional "Apply" blue
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              borderRadius: 8, // Rounded corners
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 3, // For Android shadow
-            }}
+            style={[styles.sliderButton, { backgroundColor: '#C0392B' }]}
           >
-            <Text style={{
-              color: 'white',
-              fontSize: 16,
-              fontWeight: 'bold',
-              textTransform: 'uppercase', // Makes text look cleaner
-            }}>
+            <Text style={styles.sliderButtonText}>
               HARD
             </Text>
           </TouchableOpacity>
         </View>
         <TouchableOpacity
           onPress={() => setGridConfig({ ...gridConfig, frequency })}
-          style={{
-            backgroundColor: '#007AFF', // Professional "Apply" blue
-            paddingVertical: 10,
-            paddingHorizontal: 20,
-            borderRadius: 8, // Rounded corners
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 3, // For Android shadow
-          }}
+          style={[styles.sliderButton, { backgroundColor: '#007AFF' }]}
         >
-          <Text style={{
-            color: 'white',
-            fontSize: 16,
-            fontWeight: 'bold',
-            textTransform: 'uppercase', // Makes text look cleaner
-          }}>
+          <Text style={styles.sliderButtonText}>
             APPLY
           </Text>
         </TouchableOpacity>
@@ -463,27 +395,9 @@ function App(): React.JSX.Element {
             setShowSlider(false);
             setFrequency(gridConfig.frequency);
           }}
-          style={{
-            backgroundColor: '#FF3B30', // Professional "Cancel" red
-            paddingVertical: 10,
-            marginTop: 5,
-            paddingHorizontal: 20,
-            borderRadius: 8, // Rounded corners
-            alignItems: 'center',
-            justifyContent: 'center',
-            shadowColor: '#000',
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 3, // For Android shadow
-          }}
+          style={[styles.sliderButton, { backgroundColor: '#FF3B30' }]}
         >
-          <Text style={{
-            color: 'white',
-            fontSize: 16,
-            fontWeight: 'bold',
-            textTransform: 'uppercase', // Makes text look cleaner
-          }}>
+          <Text style={styles.sliderButtonText}>
             Cancel
           </Text>
         </TouchableOpacity>
@@ -574,6 +488,25 @@ const styles = StyleSheet.create({
   emoji: {
     fontSize: 34,
   },
+  sliderButton: {
+    paddingVertical: 10,
+    marginTop: 5,
+    paddingHorizontal: 15,
+    borderRadius: 8, // Rounded corners
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3, // For Android shadow
+  },
+  sliderButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textTransform: 'uppercase', // Makes text look cleaner
+  }
 });
 
 export default App;
