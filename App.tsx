@@ -340,14 +340,14 @@ function App(): React.JSX.Element {
             style={{ width: 200, height: 80, padding: 0 }}
             step={0.01}
             minimumValue={0.1}
-            maximumValue={1}
+            maximumValue={0.3}
             onValueChange={(value) => setFrequency(value)}
             value={frequency}
             minimumTrackTintColor='green'
             maximumTrackTintColor="#000000"
 
           />
-          <TouchableOpacity onPress={() => setFrequency(prevFrequency => Math.min(prevFrequency + 0.01, 1))}>
+          <TouchableOpacity onPress={() => setFrequency(prevFrequency => Math.min(prevFrequency + 0.01, 0.3))}>
             <IconAnt
               name="plus"
               size={20}
