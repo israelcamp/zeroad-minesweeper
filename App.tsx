@@ -91,7 +91,7 @@ function App(): React.JSX.Element {
 
   const [frequency, setFrequency] = useState<number>(presetFrequency);
   const [gridConfig, setGridConfig] = useState<GridConfig>(presetGridConfig);
-  const [showSlider, setShowSlider] = useState<boolean>(true);
+  const [showSlider, setShowSlider] = useState<boolean>(false);
   const resetGrid = () => generateGrid(gridConfig);
 
   const [state, setState] = useState<GameState>({
@@ -273,7 +273,7 @@ function App(): React.JSX.Element {
   )
 
   const messageBubble = (message: string) => (
-    <View style={{ alignItems: 'center', position: 'absolute', top: 45, left: '50%', transform: [{ translateX: -75 }] }}>
+    <View style={{ alignItems: 'center', position: 'absolute', top: 45, left: '49.5%', transform: [{ translateX: -75 }] }}>
       {/* Triangle (Speech Tail) */}
       <View style={{
         width: 0,
