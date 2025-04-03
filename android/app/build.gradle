@@ -85,7 +85,7 @@ android {
 
     namespace "com.minesweeper"
     defaultConfig {
-        applicationId "com.minesweeper"
+        applicationId "com.appisnotnone.minesweeper"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
