@@ -17,6 +17,11 @@ A clean and modern implementation of the classic **Minesweeper** game built with
 - ☁️ Persistent state across app launches
 
 ---
+
+## Privacy Policy
+
+This app does not collect any personal data. All game settings and states are stored locally on your device. For more details, please refer to our [Privacy Policy](PRIVACY.md).
+
 ## Contributing
 
 Contributions are welcome! If you have suggestions or improvements, please open an issue or submit a pull request.
