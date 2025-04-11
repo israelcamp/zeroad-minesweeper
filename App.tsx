@@ -200,10 +200,8 @@ function App(): React.JSX.Element {
     setStartTimestamp(0);
 
     const updateState = {
-      gameStarted: false,
-      gameEnded: false,
       grid: resetGrid(),
-      elapsed: 0,
+      elapsedTimeSinceLastPlay: 0,
       status: GameStatus.IDLE
     };
     setShowSlider(false);
