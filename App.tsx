@@ -48,7 +48,6 @@ type GameState = {
   gameStarted: boolean,
   gameEnded: boolean,
   grid: GridCell[],
-  start: number,
   lastPlay: number,
   elapsedTimeSinceLastPlay: number
 }
@@ -74,6 +73,7 @@ function App(): React.JSX.Element {
   const presetFrequency = 0.1;
   const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
+  const [startTimestamp, setStartTimestamp] = useState<number>(0);
   const [emoji, setEmoji] = useState<string>(emojis.idle);
   const [interval, setElapsedInterval] = useState<any>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
@@ -86,7 +86,6 @@ function App(): React.JSX.Element {
     gameStarted: false,
     gameEnded: false,
     grid: resetGrid(),
-    start: getTimestamp(),
     lastPlay: getTimestamp(),
     elapsedTimeSinceLastPlay: 0
   });
@@ -145,13 +144,29 @@ function App(): React.JSX.Element {
 
   }, [state, showSlider]);
 
+  useEffect(() => {
+    if (startTimestamp > 0) {
+      setElapsedInterval(
+        setInterval(() => {
+          const timestamp = getTimestamp();
+          setElapsedTime(getSecondsDiff(timestamp, startTimestamp));
+        }, 1000)
+      )
+    } else if (startTimestamp === 0) {
+      setElapsedTime(0);
+      clearElapsedInterval();
+    } else if (startTimestamp === -1) {
+      clearElapsedInterval();
+    }
+  }, [startTimestamp]);
+
   const clearElapsedInterval = () => {
     clearInterval(interval);
     setElapsedInterval(null);
   }
 
   const endGameState = (state: GameState) => {
-    clearElapsedInterval()
+    setStartTimestamp(-1);
     return {
       ...state,
       gameStarted: false,
@@ -160,17 +175,10 @@ function App(): React.JSX.Element {
   };
 
   const startGameState = (state: GameState) => {
-    setElapsedInterval(
-      setInterval(() => {
-        const timestamp = getTimestamp();
-        setElapsedTime(getSecondsDiff(timestamp, state.start));
-      }, 1000)
-    )
-
+    setStartTimestamp(getTimestamp());
     return {
       ...state,
       gameStarted: true,
-      start: getTimestamp(),
       lastPlay: getTimestamp(),
     }
   };
@@ -180,14 +188,12 @@ function App(): React.JSX.Element {
       setShowSlider(false);
     }
 
-    clearElapsedInterval();
-    setElapsedTime(0);
+    setStartTimestamp(0);
 
     const updateState = {
       gameStarted: false,
       gameEnded: false,
       grid: resetGrid(),
-      start: getTimestamp(),
       elapsed: 0,
     };
     setShowSlider(false);
