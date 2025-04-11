@@ -50,7 +50,6 @@ type GameState = {
   grid: GridCell[],
   start: number,
   lastPlay: number,
-  elapsed: number,
   emoji: string,
   elapsedTimeSinceLastPlay: number
 }
@@ -89,7 +88,6 @@ function App(): React.JSX.Element {
     grid: resetGrid(),
     start: getTimestamp(),
     lastPlay: getTimestamp(),
-    elapsed: 0,
     elapsedTimeSinceLastPlay: 0,
     emoji: emojis.idle,
   });
@@ -116,13 +114,12 @@ function App(): React.JSX.Element {
     const interval_ = setInterval(() => {
       if (state.gameStarted) {
         const timestamp = getTimestamp();
-        const elapsed = getSecondsDiff(timestamp, state.start);
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
 
         let emoji = emojis.playing;
         if (showSlider) emoji = emojis.slider;
         else if (elapsedTimeSinceLastPlay > 5) emoji = emojis.waiting;
-        setState({ ...state, elapsed, elapsedTimeSinceLastPlay, emoji });
+        setState({ ...state, elapsedTimeSinceLastPlay, emoji });
       }
     }, 1000);
     return () => clearInterval(interval_);
