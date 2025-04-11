@@ -62,19 +62,6 @@ const XIcon = () => <IconMaterial name="flag-remove" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 const vibrate = (duration: number) => Vibration.vibrate(duration);
-const startGameState = (state: GameState) => ({
-  ...state,
-  gameStarted: true,
-  start: getTimestamp(),
-  lastPlay: getTimestamp(),
-  emoji: emojis.playing,
-});
-const endGameState = (state: GameState, emoji: string) => ({
-  ...state,
-  gameStarted: false,
-  gameEnded: true,
-  emoji,
-});
 
 const storage = new MMKVLoader().initialize();
 
@@ -89,6 +76,8 @@ function App(): React.JSX.Element {
   const presetFrequency = 0.1;
   const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
+  const [interval, setElapsedInterval] = useState<any>(null);
+  const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(presetFrequency);
   const [gridConfig, setGridConfig] = useState<GridConfig>(presetGridConfig);
   const [showSlider, setShowSlider] = useState<boolean>(false);
@@ -124,7 +113,7 @@ function App(): React.JSX.Element {
   }, [gridConfig]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval_ = setInterval(() => {
       if (state.gameStarted) {
         const timestamp = getTimestamp();
         const elapsed = getSecondsDiff(timestamp, state.start);
@@ -136,7 +125,7 @@ function App(): React.JSX.Element {
         setState({ ...state, elapsed, elapsedTimeSinceLastPlay, emoji });
       }
     }, 1000);
-    return () => clearInterval(interval);
+    return () => clearInterval(interval_);
   }, [state]);
 
   useEffect(() => {
@@ -160,10 +149,44 @@ function App(): React.JSX.Element {
     }
   }, [showSlider]);
 
+  const clearElapsedInterval = () => {
+    clearInterval(interval);
+    setElapsedInterval(null);
+  }
+
+  const endGameState = (state: GameState, emoji: string) => {
+    clearElapsedInterval()
+    return {
+      ...state,
+      gameStarted: false,
+      gameEnded: true,
+      emoji,
+    }
+  };
+
+  const startGameState = (state: GameState) => {
+    setElapsedInterval(
+      setInterval(() => {
+        setElapsedTime(prevElapsedTime => prevElapsedTime + 1);
+      }, 1000)
+    )
+
+    return {
+      ...state,
+      gameStarted: true,
+      start: getTimestamp(),
+      lastPlay: getTimestamp(),
+      emoji: emojis.playing,
+    }
+  };
+
   const resetGame = () => {
     if (showSlider) {
       setShowSlider(false);
     }
+
+    clearElapsedInterval();
+    setElapsedTime(0);
 
     const updateState = {
       gameStarted: false,
@@ -199,8 +222,6 @@ function App(): React.JSX.Element {
     vibrate(50);
 
     let newState = { ...state };
-    if (!newState.gameStarted)
-      newState = startGameState(newState);
 
     const updatedCell = {
       ...cell,
@@ -222,6 +243,9 @@ function App(): React.JSX.Element {
       updatedCell.backgroundColor = backgroundColors.openBomb;
       newState = endGameState(newState, emojis.defeat);
     };
+
+    if (!newState.gameStarted && !newState.gameEnded)
+      newState = startGameState(newState);
 
     newState.lastPlay = getTimestamp();
     setState(newState);
@@ -392,7 +416,7 @@ function App(): React.JSX.Element {
           <Icon name="gear" size={28} color="gray" />
         </TouchableOpacity>
       </View>
-      <Text style={styles.timer}>{Math.min(state.elapsed, 999)}</Text>
+      <Text style={styles.timer}>{Math.min(elapsedTime, 999)}</Text>
     </View>
   );
 
