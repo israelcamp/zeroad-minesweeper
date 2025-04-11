@@ -50,7 +50,6 @@ type GameState = {
   grid: GridCell[],
   start: number,
   lastPlay: number,
-  emoji: string,
   elapsedTimeSinceLastPlay: number
 }
 
@@ -75,6 +74,7 @@ function App(): React.JSX.Element {
   const presetFrequency = 0.1;
   const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
+  const [emoji, setEmoji] = useState<string>(emojis.idle);
   const [interval, setElapsedInterval] = useState<any>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [frequency, setFrequency] = useState<number>(presetFrequency);
@@ -88,8 +88,7 @@ function App(): React.JSX.Element {
     grid: resetGrid(),
     start: getTimestamp(),
     lastPlay: getTimestamp(),
-    elapsedTimeSinceLastPlay: 0,
-    emoji: emojis.idle,
+    elapsedTimeSinceLastPlay: 0
   });
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
 
@@ -115,11 +114,7 @@ function App(): React.JSX.Element {
       if (state.gameStarted) {
         const timestamp = getTimestamp();
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
-
-        let emoji = emojis.playing;
-        if (showSlider) emoji = emojis.slider;
-        else if (elapsedTimeSinceLastPlay > 5) emoji = emojis.waiting;
-        setState({ ...state, elapsedTimeSinceLastPlay, emoji });
+        setState({ ...state, elapsedTimeSinceLastPlay });
       }
     }, 1000);
     return () => clearInterval(interval_);
@@ -137,27 +132,30 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     if (showSlider) {
-      setState({ ...state, emoji: emojis.slider });
+      setEmoji(emojis.slider);
+    } else if (state.gameEnded) {
+      setEmoji(emojis.defeat);
+    } else if (state.elapsedTimeSinceLastPlay >= 5) {
+      setEmoji(emojis.waiting);
     } else if (state.gameStarted) {
-      setState({ ...state, emoji: emojis.playing });
+      setEmoji(emojis.playing);
+    } else {
+      setEmoji(emojis.idle);
     }
-    else {
-      setState({ ...state, emoji: emojis.idle });
-    }
-  }, [showSlider]);
+
+  }, [state, showSlider]);
 
   const clearElapsedInterval = () => {
     clearInterval(interval);
     setElapsedInterval(null);
   }
 
-  const endGameState = (state: GameState, emoji: string) => {
+  const endGameState = (state: GameState) => {
     clearElapsedInterval()
     return {
       ...state,
       gameStarted: false,
-      gameEnded: true,
-      emoji,
+      gameEnded: true
     }
   };
 
@@ -173,7 +171,6 @@ function App(): React.JSX.Element {
       gameStarted: true,
       start: getTimestamp(),
       lastPlay: getTimestamp(),
-      emoji: emojis.playing,
     }
   };
 
@@ -191,7 +188,6 @@ function App(): React.JSX.Element {
       grid: resetGrid(),
       start: getTimestamp(),
       elapsed: 0,
-      emoji: emojis.idle,
     };
     setShowSlider(false);
     setState({ ...state, ...updateState });
@@ -233,12 +229,12 @@ function App(): React.JSX.Element {
     newState.grid = newGrid;
     const victory = checkVictory(newGrid);
     if (victory)
-      newState = endGameState(newState, emojis.victory);
+      newState = endGameState(newState);
     if (updatedCell.isBomb) {
       vibrate(1000);
       openBombs(newState.grid);
       updatedCell.backgroundColor = backgroundColors.openBomb;
-      newState = endGameState(newState, emojis.defeat);
+      newState = endGameState(newState);
     };
 
     if (!newState.gameStarted && !newState.gameEnded)
@@ -407,7 +403,7 @@ function App(): React.JSX.Element {
       <Text style={styles.timer}>{remainingBombs}</Text>
       <View style={styles.emojiButton}>
         <TouchableOpacity onPress={() => showSlider ? noop() : resetGame()}>
-          <Text style={styles.emoji}>{state.emoji}</Text>
+          <Text style={styles.emoji}>{emoji}</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={setSliderTrue}>
           <Icon name="gear" size={28} color="gray" />
@@ -421,7 +417,7 @@ function App(): React.JSX.Element {
     <View style={styles.container}>
       {header()}
       {gridView()}
-      {state.gameEnded ? messageBubble(state.emoji === emojis.victory ? "Congratulations..." : "Better luck next time!") : <></>}
+      {state.gameEnded ? messageBubble(emoji === emojis.victory ? "Congratulations..." : "Better luck next time!") : <></>}
       {showSlider ? slider() : <></>}
     </View >
   );
