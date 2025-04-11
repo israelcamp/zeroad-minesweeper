@@ -162,7 +162,8 @@ function App(): React.JSX.Element {
   const startGameState = (state: GameState) => {
     setElapsedInterval(
       setInterval(() => {
-        setElapsedTime(prevElapsedTime => prevElapsedTime + 1);
+        const timestamp = getTimestamp();
+        setElapsedTime(getSecondsDiff(timestamp, state.start));
       }, 1000)
     )
 
