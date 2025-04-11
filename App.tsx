@@ -44,9 +44,15 @@ const emojis = {
   slider: '🥸'
 }
 
+enum GameStatus {
+  IDLE,
+  PLAYING,
+  VICTORY,
+  DEFEAT
+}
+
 type GameState = {
-  gameStarted: boolean,
-  gameEnded: boolean,
+  status: GameStatus,
   grid: GridCell[],
   lastPlay: number,
   elapsedTimeSinceLastPlay: number
@@ -59,6 +65,8 @@ const XIcon = () => <IconMaterial name="flag-remove" size={28} color="black" />;
 const getTimestamp = () => new Date().getTime();
 const getSecondsDiff = (t1: number, t2: number) => Math.floor((t1 - t2) / 1000);
 const vibrate = (duration: number) => Vibration.vibrate(duration);
+const didGameStart = (status: GameStatus) => status === GameStatus.PLAYING;
+const didGameEnd = (status: GameStatus) => status === GameStatus.DEFEAT || status === GameStatus.VICTORY;
 
 const storage = new MMKVLoader().initialize();
 
@@ -83,8 +91,7 @@ function App(): React.JSX.Element {
   const resetGrid = () => generateGrid(gridConfig);
 
   const [state, setState] = useState<GameState>({
-    gameStarted: false,
-    gameEnded: false,
+    status: GameStatus.IDLE,
     grid: resetGrid(),
     lastPlay: getTimestamp(),
     elapsedTimeSinceLastPlay: 0
@@ -110,7 +117,7 @@ function App(): React.JSX.Element {
 
   useEffect(() => {
     const interval_ = setInterval(() => {
-      if (state.gameStarted) {
+      if (didGameStart(state.status)) {
         const timestamp = getTimestamp();
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
         setState({ ...state, elapsedTimeSinceLastPlay });
@@ -132,11 +139,13 @@ function App(): React.JSX.Element {
   useEffect(() => {
     if (showSlider) {
       setEmoji(emojis.slider);
-    } else if (state.gameEnded) {
+    } else if (state.status === GameStatus.DEFEAT) {
       setEmoji(emojis.defeat);
+    } else if (state.status === GameStatus.VICTORY) {
+      setEmoji(emojis.victory);
     } else if (state.elapsedTimeSinceLastPlay >= 5) {
       setEmoji(emojis.waiting);
-    } else if (state.gameStarted) {
+    } else if (didGameStart(state.status)) {
       setEmoji(emojis.playing);
     } else {
       setEmoji(emojis.idle);
@@ -158,6 +167,7 @@ function App(): React.JSX.Element {
     } else if (startTimestamp === -1) {
       clearElapsedInterval();
     }
+    return clearInterval(interval)
   }, [startTimestamp]);
 
   const clearElapsedInterval = () => {
@@ -165,20 +175,19 @@ function App(): React.JSX.Element {
     setElapsedInterval(null);
   }
 
-  const endGameState = (state: GameState) => {
+  const endGameState = (state: GameState, status: GameStatus) => {
     setStartTimestamp(-1);
     return {
       ...state,
-      gameStarted: false,
-      gameEnded: true
+      status
     }
   };
 
-  const startGameState = (state: GameState) => {
+  const startGameState = (state: GameState, status: GameStatus) => {
     setStartTimestamp(getTimestamp());
     return {
       ...state,
-      gameStarted: true,
+      status,
       lastPlay: getTimestamp(),
     }
   };
@@ -195,20 +204,21 @@ function App(): React.JSX.Element {
       gameEnded: false,
       grid: resetGrid(),
       elapsed: 0,
+      status: GameStatus.IDLE
     };
     setShowSlider(false);
     setState({ ...state, ...updateState });
   }
 
   const toogleFlag = (cell: GridCell) => {
-    if (state.gameEnded)
+    if (didGameEnd(state.status))
       return;
 
     vibrate(100);
 
     let newState = { ...state };
-    if (!newState.gameStarted)
-      newState = startGameState(newState);
+    if (!didGameStart(newState.status))
+      newState = startGameState(newState, GameStatus.PLAYING);
 
     if (!cell.pressed)
       newState.grid[cell.index] = { ...cell, hasFlag: !cell.hasFlag };
@@ -217,11 +227,12 @@ function App(): React.JSX.Element {
   };
 
   const handleCellPress = (cell: GridCell, index: number) => {
-    if (state.gameEnded || cell.hasFlag || showSlider)
+    if (didGameEnd(state.status) || cell.hasFlag || showSlider)
       return;
     vibrate(50);
 
     let newState = { ...state };
+    newState.lastPlay = getTimestamp();
 
     const updatedCell = {
       ...cell,
@@ -236,18 +247,17 @@ function App(): React.JSX.Element {
     newState.grid = newGrid;
     const victory = checkVictory(newGrid);
     if (victory)
-      newState = endGameState(newState);
+      newState = endGameState(newState, GameStatus.VICTORY);
     if (updatedCell.isBomb) {
       vibrate(1000);
       openBombs(newState.grid);
       updatedCell.backgroundColor = backgroundColors.openBomb;
-      newState = endGameState(newState);
+      newState = endGameState(newState, GameStatus.DEFEAT);
     };
 
-    if (!newState.gameStarted && !newState.gameEnded)
-      newState = startGameState(newState);
+    if (!didGameStart(newState.status) && !didGameEnd(newState.status))
+      newState = startGameState(newState, GameStatus.PLAYING);
 
-    newState.lastPlay = getTimestamp();
     setState(newState);
   };
 
@@ -256,7 +266,7 @@ function App(): React.JSX.Element {
   }
 
   const cellText = (cell: GridCell) => {
-    if (state.gameEnded && cell.hasFlag && !cell.isBomb) return <XIcon />;
+    if (didGameEnd(state.status) && cell.hasFlag && !cell.isBomb) return <XIcon />;
     if (cell.hasFlag) return <FlagIcon />;
     if (cell.isBomb && cell.pressed) return <BombIcon />;
     return (
@@ -424,7 +434,7 @@ function App(): React.JSX.Element {
     <View style={styles.container}>
       {header()}
       {gridView()}
-      {state.gameEnded ? messageBubble(emoji === emojis.victory ? "Congratulations..." : "Better luck next time!") : <></>}
+      {didGameEnd(state.status) ? messageBubble(state.status === GameStatus.VICTORY ? "Congratulations..." : "Better luck next time!") : <></>}
       {showSlider ? slider() : <></>}
     </View >
   );
