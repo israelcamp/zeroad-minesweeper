@@ -12,12 +12,9 @@ import {
   View,
   Vibration,
   Pressable,
-  TouchableOpacity
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
-import IconAnt from "react-native-vector-icons/AntDesign";
-import Slider from '@react-native-community/slider';
 import { MMKVLoader } from 'react-native-mmkv-storage';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
@@ -33,6 +30,7 @@ import {
   openBombs,
   backgroundColors
 } from './utils/array';
+import { Slider, Difficulty } from './components/slider';
 import { Header } from './components/header';
 
 
@@ -50,12 +48,6 @@ enum GameStatus {
   PLAYING,
   VICTORY,
   DEFEAT
-}
-
-type Difficulty = {
-  frequency: number;
-  backgroundColor: string;
-  text: string;
 }
 
 type GameState = {
@@ -339,88 +331,19 @@ function App(): React.JSX.Element {
   );
 
   const slider = () => (
-    <>
-      <View style={{
-        padding: 15,
-        position: 'absolute',
-        top: 80,
-        left: '50%',
-        transform: [{ translateX: -145 }],
-        backgroundColor: 'white',
-        borderRadius: 10,
-      }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={{ flex: 1, textAlign: 'center', fontSize: 18 }}>
-            Bombs Probability
-          </Text>
-        </View>
-        <Text style={{ textAlign: 'center', fontSize: 18, paddingTop: 10 }}>
-          {(frequency * 100).toFixed(0)}%
-        </Text>
-        {/* Row container for Slider + Icon */}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <TouchableOpacity onPress={() => setFrequency(prevFrequency => Math.max(prevFrequency - 0.01, 0.1))}>
-            <IconAnt
-              name="minus"
-              size={20}
-              color="black"
-              style={{ marginLeft: 10, marginBottom: 3 }}
-            />
-          </TouchableOpacity>
-          <Slider
-            style={{ width: 200, height: 80, padding: 0 }}
-            step={0.01}
-            minimumValue={0.1}
-            maximumValue={0.3}
-            onValueChange={(value) => setFrequency(value)}
-            value={frequency}
-            minimumTrackTintColor='green'
-            maximumTrackTintColor="#000000"
-
-          />
-          <TouchableOpacity onPress={() => setFrequency(prevFrequency => Math.min(prevFrequency + 0.01, 0.3))}>
-            <IconAnt
-              name="plus"
-              size={20}
-              color="black"
-              style={{ marginLeft: 10, marginBottom: 3 }}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 10 }}>
-          {difficulties.map((difficulty, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => setFrequency(difficulty.frequency)}
-              style={[styles.sliderButton, { backgroundColor: difficulty.backgroundColor }]}
-          >
-              <Text style={styles.sliderButtonText}>
-                {difficulty.text}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <TouchableOpacity
-          onPress={() => setGridConfig({ ...gridConfig, frequency })}
-          style={[styles.sliderButton, { backgroundColor: '#007AFF' }]}
-        >
-          <Text style={styles.sliderButtonText}>
-            APPLY
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => {
-            setShowSlider(false);
-            setFrequency(gridConfig.frequency);
-          }}
-          style={[styles.sliderButton, { backgroundColor: '#FF3B30' }]}
-        >
-          <Text style={styles.sliderButtonText}>
-            Cancel
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </>
+    <Slider
+      currentFrequency={frequency}
+      onMinusPress={() => setFrequency(prevFrequency => Math.max(prevFrequency - 0.01, 0.1))}
+      onPlusPress={() => setFrequency(prevFrequency => Math.min(prevFrequency + 0.01, 0.3))}
+      onValueChange={(value) => setFrequency(value)}
+      onCancelPress={() => setShowSlider(false)}
+      onApplyPress={() => setGridConfig({ ...gridConfig, frequency })}
+      onDifficultyPress={setFrequency}
+      step={0.01}
+      minimumValue={0.1}
+      maximumValue={0.3}
+      difficulties={difficulties}
+    />
   );
 
   return (
@@ -469,25 +392,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  sliderButton: {
-    paddingVertical: 10,
-    marginTop: 5,
-    paddingHorizontal: 15,
-    borderRadius: 8, // Rounded corners
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3, // For Android shadow
-  },
-  sliderButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    textTransform: 'uppercase', // Makes text look cleaner
   },
   messageBubbleContainer: {
     alignItems: 'center',
