@@ -33,6 +33,7 @@ import {
   openBombs,
   backgroundColors
 } from './utils/array';
+import { Header } from './components/header';
 
 
 const emojis = {
@@ -422,24 +423,16 @@ function App(): React.JSX.Element {
     </>
   );
 
-  const header = () => (
-    <View style={[styles.header, { height: headerHeight }]}>
-      <Text style={styles.timer}>{remainingBombs}</Text>
-      <View style={styles.emojiButton}>
-        <TouchableOpacity onPress={() => showSlider ? noop() : resetGame()}>
-          <Text style={styles.emoji}>{emoji}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={setSliderTrue}>
-          <Icon name="gear" size={28} color="gray" />
-        </TouchableOpacity>
-      </View>
-      <Text style={styles.timer}>{Math.min(elapsedTime, 999)}</Text>
-    </View>
-  );
-
   return (
     <View style={styles.container}>
-      {header()}
+      <Header
+        headerHeight={headerHeight}
+        remainingBombs={remainingBombs}
+        elapsedTime={elapsedTime}
+        emoji={emoji}
+        onEmojiPress={() => showSlider ? noop() : resetGame()}
+        onGearPress={setSliderTrue}
+      />
       {gridView()}
       {didGameEnd(state.status) ? messageBubble(state.status === GameStatus.VICTORY ? "Congratulations..." : "Better luck next time!") : <></>}
       {showSlider ? slider() : <></>}
@@ -476,34 +469,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between", // Keeps the two timers apart
-    alignItems: "center",
-    paddingTop: '1%',
-    paddingRight: '8%',
-    paddingLeft: '8%',
-    backgroundColor: "#264653",
-    borderBottomColor: "black",
-    borderBottomWidth: 2
-  },
-  timer: {
-    fontSize: 34,
-    color: "white",
-    width: '20%', // Ensures equal spacing on both sides
-    textAlign: "center",
-  },
-  emojiButton: {
-    flex: 1, // Takes up remaining space
-    flexDirection: "row",
-    marginLeft: 58,
-    gap: 30,
-    justifyContent: "center", // Centers the emoji vertically
-    alignItems: "center", // Centers the emoji horizontally
-  },
-  emoji: {
-    fontSize: 34,
   },
   sliderButton: {
     paddingVertical: 10,
