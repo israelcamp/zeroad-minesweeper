@@ -126,8 +126,10 @@ function App(): React.JSX.Element {
   }, [state]);
 
   useEffect(() => {
-    const bombs = state.grid.filter((cell) => cell.isBomb).length;
-    const flags = state.grid.filter((cell) => cell.hasFlag).length;
+    const { bombs, flags } = state.grid.reduce((acc, cell) => ({
+      bombs: acc.bombs + (cell.isBomb ? 1 : 0),
+      flags: acc.flags + (cell.hasFlag ? 1 : 0)
+    }), { bombs: 0, flags: 0 });
     setRemainingBombs(Math.max(bombs - flags, 0));
   }, [state]);
 
@@ -150,7 +152,7 @@ function App(): React.JSX.Element {
       setEmoji(emojis.idle);
     }
 
-  }, [state, showSlider]);
+  }, [state, showSlider, elapsedTimeSinceLastPlay]);
 
   useEffect(() => {
     if (startTimestamp > 0) {
