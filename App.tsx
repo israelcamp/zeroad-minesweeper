@@ -51,11 +51,23 @@ enum GameStatus {
   DEFEAT
 }
 
+type Difficulty = {
+  frequency: number;
+  backgroundColor: string;
+  text: string;
+}
+
 type GameState = {
   status: GameStatus,
   grid: GridCell[],
   lastPlay: number,
 }
+
+const difficulties: Difficulty[] = [
+  { frequency: 0.1, backgroundColor: '#27AE60', text: 'EASY' },
+  { frequency: 0.15, backgroundColor: '#E67E22', text: 'MEDIUM' },
+  { frequency: 0.2, backgroundColor: '#C0392B', text: 'HARD' }
+]
 
 const noop = () => { };
 const BombIcon = () => <Icon name="bomb" size={28} color="black" />;
@@ -80,6 +92,7 @@ function App(): React.JSX.Element {
   const presetFrequency = 0.1;
   const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
+  
   const [startTimestamp, setStartTimestamp] = useState<number>(0);
   const [elapsedTimeSinceLastPlay, setElapsedTimeSinceLastPlay] = useState<number>(0);
   const [emoji, setEmoji] = useState<string>(emojis.idle);
@@ -370,30 +383,17 @@ function App(): React.JSX.Element {
           </TouchableOpacity>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingBottom: 10 }}>
-          <TouchableOpacity
-            onPress={() => setFrequency(0.1)}
-            style={[styles.sliderButton, { backgroundColor: '#27AE60' }]}
+          {difficulties.map((difficulty, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => setFrequency(difficulty.frequency)}
+              style={[styles.sliderButton, { backgroundColor: difficulty.backgroundColor }]}
           >
-            <Text style={styles.sliderButtonText}>
-              EASY
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setFrequency(0.15)}
-            style={[styles.sliderButton, { backgroundColor: '#E67E22' }]}
-          >
-            <Text style={styles.sliderButtonText}>
-              MEDIUM
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setFrequency(0.2)}
-            style={[styles.sliderButton, { backgroundColor: '#C0392B' }]}
-          >
-            <Text style={styles.sliderButtonText}>
-              HARD
-            </Text>
-          </TouchableOpacity>
+              <Text style={styles.sliderButtonText}>
+                {difficulty.text}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
         <TouchableOpacity
           onPress={() => setGridConfig({ ...gridConfig, frequency })}
