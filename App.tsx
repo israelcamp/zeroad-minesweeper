@@ -139,11 +139,15 @@ function App(): React.JSX.Element {
   }, [state]);
 
   useEffect(() => {
-    const { bombs, flags } = state.grid.reduce((acc, cell) => ({
-      bombs: acc.bombs + (cell.isBomb ? 1 : 0),
-      flags: acc.flags + (cell.hasFlag ? 1 : 0)
-    }), { bombs: 0, flags: 0 });
-    setRemainingBombs(Math.max(bombs - flags, 0));
+    if (state.status === GameStatus.VICTORY) {
+      setRemainingBombs(0); // Reset remaining bombs when game is won
+    } else {
+      const { bombs, flags } = state.grid.reduce((acc, cell) => ({
+        bombs: acc.bombs + (cell.isBomb ? 1 : 0),
+        flags: acc.flags + (cell.hasFlag ? 1 : 0)
+      }), { bombs: 0, flags: 0 });
+      setRemainingBombs(Math.max(bombs - flags, 0));
+    }
   }, [state]);
 
   useEffect(() => {
