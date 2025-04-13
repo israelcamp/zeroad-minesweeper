@@ -32,7 +32,7 @@ import {
 } from './utils/array';
 import { Slider, Difficulty } from './components/slider';
 import { Header } from './components/header';
-
+import { MessageBubble } from './components/messageBubble';
 
 const emojis = {
   playing: '🧐',
@@ -274,10 +274,6 @@ function App(): React.JSX.Element {
     setState(newState);
   };
 
-  const setSliderTrue = () => {
-    setShowSlider(true);
-  }
-
   const cellText = (cell: GridCell) => {
     if (didGameEnd(state.status) && cell.hasFlag && !cell.isBomb) return <XIcon />;
     if (cell.hasFlag) return <FlagIcon />;
@@ -319,16 +315,10 @@ function App(): React.JSX.Element {
     </View>
   )
 
-  const messageBubble = (message: string) => (
-    <View style={styles.messageBubbleContainer}>
-      <View style={styles.messageBubbleTriangle} />
-      <View style={styles.messageBubbleText}>
-        <Text style={{ textAlign: 'center' }}>
-          {message}
-        </Text>
-      </View>
-    </View >
-  );
+  const messageBubble = () => {
+    const message = state.status === GameStatus.VICTORY ? "Congratulations..." : "Better luck next time!";
+    return <MessageBubble message={message} />
+  }
 
   const slider = () => (
     <Slider
@@ -354,10 +344,10 @@ function App(): React.JSX.Element {
         elapsedTime={elapsedTime}
         emoji={emoji}
         onEmojiPress={() => showSlider ? noop() : resetGame()}
-        onGearPress={setSliderTrue}
+        onGearPress={() => setShowSlider(true)}
       />
       {gridView()}
-      {didGameEnd(state.status) ? messageBubble(state.status === GameStatus.VICTORY ? "Congratulations..." : "Better luck next time!") : <></>}
+      {didGameEnd(state.status) ? messageBubble() : <></>}
       {showSlider ? slider() : <></>}
     </View >
   );
@@ -392,36 +382,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  messageBubbleContainer: {
-    alignItems: 'center',
-    position: 'absolute',
-    top: 45,
-    left: '50%',
-    transform: [{ translateX: -75 }]
-  },
-  messageBubbleTriangle: {
-    width: 0,
-    height: 0,
-    borderLeftWidth: 10,
-    borderRightWidth: 10,
-    borderBottomWidth: 15,
-    borderLeftColor: "transparent",
-    borderRightColor: "transparent",
-    borderBottomColor: "white",
-    alignSelf: 'center'
-  },
-  messageBubbleText: {
-    width: 150,
-    padding: 10,
-    backgroundColor: 'white',
-    borderRadius: 10,
-    alignItems: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
   }
 });
 
