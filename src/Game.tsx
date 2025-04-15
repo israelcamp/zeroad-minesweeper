@@ -359,6 +359,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
         remainingBombs={remainingBombs}
         elapsedTime={elapsedTime}
         emoji={emoji}
+        onStatPress={() => navigation.navigate('Stats')}
         onEmojiPress={() => showSlider ? noop() : resetGame()}
         onGearPress={() => setShowSlider(true)}
       />

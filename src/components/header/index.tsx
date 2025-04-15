@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity } from "react-native";
 import { View } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome6";
+import IconMaterial from "react-native-vector-icons/MaterialIcons";
 import { Text } from "react-native";
 import { StyleSheet } from "react-native";
 
@@ -12,6 +13,7 @@ interface HeaderProps {
     elapsedTime: number;
     onEmojiPress: () => void;
     onGearPress: () => void;
+    onStatPress: () => void;
 }
   
 export const Header: React.FC<HeaderProps> = ({
@@ -20,11 +22,15 @@ export const Header: React.FC<HeaderProps> = ({
     emoji,
     elapsedTime,
     onEmojiPress,
-    onGearPress
+    onGearPress,
+    onStatPress
   }) => (
     <View style={[styles.header, { height: headerHeight }]}>
       <Text style={styles.timer}>{remainingBombs}</Text>
       <View style={styles.emojiButton}>
+        <TouchableOpacity onPress={onStatPress}>
+          <IconMaterial name="query-stats" size={28} color="#2ECC71" />
+        </TouchableOpacity>
         <TouchableOpacity onPress={onEmojiPress}>
           <Text style={styles.emoji}>{emoji}</Text>
         </TouchableOpacity>
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
     emojiButton: {
         flex: 1, // Takes up remaining space
         flexDirection: "row",
-        marginLeft: 58,
+        marginLeft: 0,
         gap: 30,
         justifyContent: "center", // Centers the emoji vertically
         alignItems: "center", // Centers the emoji horizontally
