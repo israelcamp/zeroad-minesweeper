@@ -74,7 +74,7 @@ const didGameEnd = (status: GameStatus) => status === GameStatus.DEFEAT || statu
 
 const storage = new MMKVLoader().initialize();
 
-function Game(): React.JSX.Element {
+function Game({ navigation }: { navigation: any }): React.JSX.Element {
   useKeepAwake();
 
   const { width, height } = getScreenSize();
