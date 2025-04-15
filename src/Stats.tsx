@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
+import Icon from "react-native-vector-icons/FontAwesome6";
 import { getScreenSize } from './utils/dimension';
 import { GameStorage, GameRecord } from './utils/storage';
 
-const Stats = () => {
+const Stats = ({ navigation }: {navigation: any}) => {
   const { width } = getScreenSize();
   const [gameHistory, setGameHistory] = useState<GameRecord[]>([]);
   const [stats, setStats] = useState({
@@ -40,17 +41,17 @@ const Stats = () => {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-  
+
   const data = {
-    labels: gameHistory.map((_, index) => `${index + 1}`),
+    labels: gameHistory.map(game => game.bombs.toString()),
     datasets: [
       {
-        data: gameHistory.map(game => game.bombs),
+        data: gameHistory.map(game => game.time),
         color: (opacity = 1) => `rgba(128, 128, 128, ${opacity})`,
         strokeWidth: 2
       }
     ],
-    legend: ["Bombs Found"]
+    legend: ["Time (s)"]
   };
 
   const chartConfig = {
@@ -85,6 +86,12 @@ const Stats = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.closeButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="xmark" size={24} color="#333" />
+        </TouchableOpacity>
         <Text style={styles.title}>Game Statistics</Text>
         <Text style={styles.subtitle}>Track your minesweeper performance</Text>
       </View>
@@ -108,22 +115,27 @@ const Stats = () => {
         </View>
       </View>
 
-      <View style={styles.chartContainer}>
-        {gameHistory.length > 0 ? (
-          <LineChart
-            data={data}
-            width={width - 32}
-            height={220}
-            chartConfig={chartConfig}
-            bezier
-            style={styles.chart}
-          />
-        ) : (
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No data available</Text>
-          </View>
-        )}
-      </View>
+      {gameHistory.length > 0 ? (
+        <LineChart
+          data={data}
+          width={width}
+          height={220}
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chart}
+          withInnerLines={false}
+          withOuterLines={true}
+          withVerticalLines={false}
+          withHorizontalLines={true}
+          withVerticalLabels={true}
+          withHorizontalLabels={true}
+          fromZero={true}
+        />
+      ) : (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>No data available</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -132,7 +144,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 8,
   },
   loadingContainer: {
     flex: 1,
@@ -143,6 +155,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     marginBottom: 24,
+    paddingHorizontal: 8,
   },
   title: {
     fontSize: 24,
@@ -161,6 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     borderRadius: 12,
     padding: 16,
+    marginHorizontal: 8,
   },
   statItem: {
     alignItems: 'center',
@@ -175,19 +189,6 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 4,
   },
-  chartContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: 252, // 220 + 32 (padding)
-  },
   chart: {
     marginVertical: 8,
     borderRadius: 16,
@@ -200,6 +201,13 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: '#666',
     fontSize: 16,
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    padding: 8,
+    zIndex: 1,
   },
 });
 
