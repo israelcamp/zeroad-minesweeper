@@ -33,6 +33,7 @@ import {
 import { Slider, Difficulty } from './components/slider';
 import { Header } from './components/header';
 import { MessageBubble } from './components/messageBubble';
+import { GameStorage } from './utils/storage';
 
 const emojis = {
   playing: '🧐',
@@ -187,7 +188,22 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   }
 
   const endGameState = (state: GameState, status: GameStatus) => {
+    
+    // Save game record if game ended in victory
+    if (status === GameStatus.VICTORY) {
+      const elapsedTime = getSecondsDiff(getTimestamp(), startTimestamp);
+      const bombsFound = state.grid.filter(cell => cell.isBomb).length;
+      
+      GameStorage.saveGame({
+        timestamp: getTimestamp(),
+        bombs: bombsFound,
+        difficulty: frequency,
+        time: elapsedTime
+      });
+    }
+    
     setStartTimestamp(-1);
+
     return {
       ...state,
       status
