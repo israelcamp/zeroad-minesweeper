@@ -24,14 +24,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
   const loadData = async () => {
     setLoading(true);
     try {
-      // const history = await GameStorage.getGameHistory();
-      const history: GameRecord[] = Array.from({ length: 50 }, (_, i) => ({
-        timestamp: Date.now() - i * 86400000, // One per day, going backwards
-        bombs: Math.floor(Math.random() * 30) + 15, // 1 to 10 bombs
-        difficulty: parseFloat((Math.random() * 0.2 + 0.1).toFixed(2)), // 0.10 to 0.30
-        time: Math.floor(Math.random() * 120) + 30 // 30s to 150s
-      }));
-
+      const history = await GameStorage.getGameHistory();
       history.sort((a, b) => a.timestamp - b.timestamp);
 
       const gameStats = await GameStorage.getStats(history);
@@ -110,22 +103,22 @@ const Stats = ({ navigation }: {navigation: any}) => {
   })();
 
   const chartConfig = {
-    backgroundColor: '#ffffff',
-    backgroundGradientFrom: '#ffffff',
-    backgroundGradientTo: '#ffffff',
+    backgroundColor: '#1a1a1a',
+    backgroundGradientFrom: '#2a2a2a',
+    backgroundGradientTo: '#1a1a1a',
     decimalPlaces: 0,
-    color: (opacity = 1) => `rgba(64, 64, 64, ${opacity})`,
-    labelColor: (opacity = 1) => `rgba(64, 64, 64, ${opacity})`,
+    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+    labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     style: {
       borderRadius: 16,
     },
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: '#808080'
+      stroke: '#4a9eff'
     },
     propsForBackgroundLines: {
-      stroke: '#E0E0E0',
+      stroke: '#404040',
       strokeWidth: 1
     }
   };
@@ -133,7 +126,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#808080" />
+        <ActivityIndicator size="large" color="#4a9eff" />
       </View>
     );
   }
@@ -145,7 +138,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
           style={styles.closeButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="xmark" size={24} color="#333" />
+          <Icon name="xmark" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.title}>Game Statistics</Text>
         <Text style={styles.subtitle}>Performance of your last 50 games</Text>
@@ -222,14 +215,14 @@ const Stats = ({ navigation }: {navigation: any}) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1a1a',
     padding: 8,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#1a1a1a',
   },
   header: {
     alignItems: 'center',
@@ -239,18 +232,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#999',
     marginTop: 4,
   },
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 24,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2a2a2a',
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 8,
@@ -261,11 +254,11 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: '#999',
     marginTop: 4,
   },
   chart: {
@@ -279,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyStateText: {
-    color: '#666',
+    color: '#999',
     fontSize: 16,
   },
   closeButton: {
@@ -292,7 +285,7 @@ const styles = StyleSheet.create({
   chartTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: '#fff',
     marginTop: 16,
     marginBottom: 8,
     paddingHorizontal: 8,
