@@ -27,12 +27,12 @@ const Stats = ({ navigation }: {navigation: any}) => {
       // const history = await GameStorage.getGameHistory();
       const history: GameRecord[] = Array.from({ length: 50 }, (_, i) => ({
         timestamp: Date.now() - i * 86400000, // One per day, going backwards
-        bombs: Math.floor(Math.random() * 10) + 1, // 1 to 10 bombs
+        bombs: Math.floor(Math.random() * 30) + 15, // 1 to 10 bombs
         difficulty: parseFloat((Math.random() * 0.2 + 0.1).toFixed(2)), // 0.10 to 0.30
         time: Math.floor(Math.random() * 120) + 30 // 30s to 150s
       }));
 
-      history.sort((a, b) => a.bombs - b.bombs);
+      history.sort((a, b) => a.timestamp - b.timestamp);
 
       const gameStats = await GameStorage.getStats(history);
       
@@ -50,9 +50,16 @@ const Stats = ({ navigation }: {navigation: any}) => {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-
+  
   const data = {
-    labels: gameHistory.map(game => game.bombs.toString()),
+    labels: gameHistory.map((game, index) => {
+      // Only show first and last timestamp
+      if (index === 0 || index === gameHistory.length - 1) {
+        const date = new Date(game.timestamp);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      }
+      return '';
+    }),
     datasets: [
       {
         data: gameHistory.map(game => game.time),
@@ -60,7 +67,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
         strokeWidth: 2
       }
     ],
-    legend: ["Time (s)"]
+    legend: ["Time to Victory (s)"]
   };
 
   const chartConfig = {
@@ -139,6 +146,8 @@ const Stats = ({ navigation }: {navigation: any}) => {
           withVerticalLabels={true}
           withHorizontalLabels={true}
           fromZero={true}
+          segments={5}
+          yAxisInterval={1}
         />
       ) : (
         <View style={styles.emptyState}>
