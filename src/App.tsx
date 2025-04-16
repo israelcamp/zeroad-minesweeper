@@ -10,7 +10,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator 
-        initialRouteName="Stats"
+        initialRouteName="Game"
         screenOptions={{
           headerShown: false
         }}

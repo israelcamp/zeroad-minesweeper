@@ -113,7 +113,6 @@ const Stats = ({ navigation }: {navigation: any}) => {
           strokeWidth: 2
         }
       ],
-      legend: ["Average Time to Victory (s)"]
     };
   })();
 
