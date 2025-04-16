@@ -56,14 +56,13 @@ export const GameStorage = {
   /**
    * Get summary statistics
    */
-  getStats: async (): Promise<{
+  getStats: async (history: GameRecord[]): Promise<{
     totalGames: number;
     averageBombs: number;
     bestBombs: number;
     averageTime: number;
     bestTime: number;
   }> => {
-    const history = await GameStorage.getGameHistory();
     
     if (history.length === 0) {
       return {

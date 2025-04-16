@@ -24,8 +24,17 @@ const Stats = ({ navigation }: {navigation: any}) => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const history = await GameStorage.getGameHistory();
-      const gameStats = await GameStorage.getStats();
+      // const history = await GameStorage.getGameHistory();
+      const history: GameRecord[] = Array.from({ length: 50 }, (_, i) => ({
+        timestamp: Date.now() - i * 86400000, // One per day, going backwards
+        bombs: Math.floor(Math.random() * 10) + 1, // 1 to 10 bombs
+        difficulty: parseFloat((Math.random() * 0.2 + 0.1).toFixed(2)), // 0.10 to 0.30
+        time: Math.floor(Math.random() * 120) + 30 // 30s to 150s
+      }));
+
+      history.sort((a, b) => a.bombs - b.bombs);
+
+      const gameStats = await GameStorage.getStats(history);
       
       setGameHistory(history);
       setStats(gameStats);
@@ -62,10 +71,10 @@ const Stats = ({ navigation }: {navigation: any}) => {
     color: (opacity = 1) => `rgba(64, 64, 64, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(64, 64, 64, ${opacity})`,
     style: {
-      borderRadius: 16
+      borderRadius: 16,
     },
     propsForDots: {
-      r: '6',
+      r: '4',
       strokeWidth: '2',
       stroke: '#808080'
     },
@@ -93,7 +102,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
           <Icon name="xmark" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.title}>Game Statistics</Text>
-        <Text style={styles.subtitle}>Track your minesweeper performance</Text>
+        <Text style={styles.subtitle}>Performance of your last 50 games</Text>
       </View>
 
       <View style={styles.statsContainer}>
@@ -119,11 +128,11 @@ const Stats = ({ navigation }: {navigation: any}) => {
         <LineChart
           data={data}
           width={width}
-          height={220}
+          height={280}
           chartConfig={chartConfig}
           bezier
           style={styles.chart}
-          withInnerLines={false}
+          withInnerLines={true}
           withOuterLines={true}
           withVerticalLines={false}
           withHorizontalLines={true}
@@ -137,6 +146,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
         </View>
       )}
     </View>
+
   );
 };
 
@@ -190,7 +200,8 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   chart: {
-    marginVertical: 8,
+    marginLeft:-32,
+    padding: 0,
     borderRadius: 16,
   },
   emptyState: {
