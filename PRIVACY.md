@@ -13,8 +13,9 @@ We do not collect, store, or share any personal information from users. The app 
 ## Local Storage Only
 
 Any preferences or settings you configure within the app are stored locally on your device and are not transmitted elsewhere. This includes:
-	•	Game settings (like difficulty level or preferences)
-	•	Gameplay state (e.g., whether a game is in progress)
+• Game settings (like difficulty level or preferences)
+• Gameplay state (e.g., whether a game is in progress)
+• Game history (time to achieve victory, difficulty level, timestamp of the match, etc.)
 
 This data stays on your phone and is removed when you uninstall the app.
 
@@ -28,15 +29,13 @@ Since no data is collected or stored, there is no data for you to request, delet
 
 ## Open Source
 
-This application is developed as an **open-source project**. You can view the full source code, contribute, or report issues in this repository. 
+This application is developed as an **open-source project**. You can view the full source code, contribute, or report issues in this repository.
 
 ## Contact
 
 If you have any questions about this policy, you can contact us at: [israelcampiotti@gmail.com]
 
-
------------------
-
+---
 
 # Versão em Português - Política de Privacidade
 
@@ -53,10 +52,12 @@ Não coletamos, armazenamos ou compartilhamos qualquer informação pessoal dos 
 ## Apenas Armazenamento Local
 
 Quaisquer preferências ou configurações feitas dentro do aplicativo são armazenadas **localmente** no seu dispositivo e **não são transmitidas para nenhum servidor externo**. Isso inclui:
+
 - Configurações do jogo (como nível de dificuldade ou preferências)
 - Estado do jogo (por exemplo, se uma partida está em andamento)
+- Histórico de partidas (tempo para vencer, nível de dificuldade, timestamp da partida, etc.)
 
-Esses dados permanecem apenas no seu telefone e são removidos ao desinstalar o aplicativo.
+  Esses dados permanecem apenas no seu telefone e são removidos ao desinstalar o aplicativo.
 
 ## Sem Análise ou Rastreamento
 
@@ -73,4 +74,3 @@ Este aplicativo é desenvolvido como um projeto de **código aberto**. Você pod
 ## Contato
 
 Se você tiver qualquer dúvida sobre esta política, pode nos contatar em: [israelcampiotti@gmail.com]
-
