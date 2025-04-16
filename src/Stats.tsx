@@ -67,7 +67,6 @@ const Stats = ({ navigation }: {navigation: any}) => {
         strokeWidth: 2
       }
     ],
-    legend: ["Time to Victory (s)"]
   };
 
   // Prepare data for bomb count performance chart
@@ -107,7 +106,6 @@ const Stats = ({ navigation }: {navigation: any}) => {
           strokeWidth: 2
         }
       ],
-      legend: ["Average Time to Victory (s)"]
     };
   })();
 
