@@ -51,9 +51,9 @@ const Stats = ({ navigation }: {navigation: any}) => {
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
   
-  const data = {
+  // Prepare data for time progression chart
+  const timeData = {
     labels: gameHistory.map((game, index) => {
-      // Only show first and last timestamp
       if (index === 0 || index === gameHistory.length - 1) {
         const date = new Date(game.timestamp);
         return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -69,6 +69,47 @@ const Stats = ({ navigation }: {navigation: any}) => {
     ],
     legend: ["Time to Victory (s)"]
   };
+
+  // Prepare data for bomb count performance chart
+  const bombCountData = (() => {
+    // Group games by bomb count ranges (bins of 5)
+    const bombGroups = gameHistory.reduce((acc, game) => {
+      const binStart = Math.floor(game.bombs / 5) * 5;
+      const binEnd = binStart + 4;
+      const binKey = `${binStart}-${binEnd}`;
+      
+      if (!acc[binKey]) {
+        acc[binKey] = { total: 0, count: 0 };
+      }
+      acc[binKey].total += game.time;
+      acc[binKey].count += 1;
+      return acc;
+    }, {} as Record<string, { total: number; count: number }>);
+
+    // Convert to array and sort by bin start
+    const sortedBins = Object.entries(bombGroups)
+      .map(([bin, data]) => ({
+        bin,
+        avgTime: data.total / data.count
+      }))
+      .sort((a, b) => {
+        const aStart = parseInt(a.bin.split('-')[0]);
+        const bStart = parseInt(b.bin.split('-')[0]);
+        return aStart - bStart;
+      });
+
+    return {
+      labels: sortedBins.map(item => item.bin),
+      datasets: [
+        {
+          data: sortedBins.map(item => item.avgTime),
+          color: (opacity = 1) => `rgba(128, 128, 128, ${opacity})`,
+          strokeWidth: 2
+        }
+      ],
+      legend: ["Average Time to Victory (s)"]
+    };
+  })();
 
   const chartConfig = {
     backgroundColor: '#ffffff',
@@ -131,11 +172,12 @@ const Stats = ({ navigation }: {navigation: any}) => {
         </View>
       </View>
 
+      <Text style={styles.chartTitle}>Time to Victory Over Time</Text>
       {gameHistory.length > 0 ? (
         <LineChart
-          data={data}
+          data={timeData}
           width={width}
-          height={280}
+          height={220}
           chartConfig={chartConfig}
           bezier
           style={styles.chart}
@@ -146,8 +188,29 @@ const Stats = ({ navigation }: {navigation: any}) => {
           withVerticalLabels={true}
           withHorizontalLabels={true}
           fromZero={true}
-          segments={5}
-          yAxisInterval={1}
+        />
+      ) : (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>No data available</Text>
+        </View>
+      )}
+
+      <Text style={styles.chartTitle}>Average Time by Bomb Count</Text>
+      {gameHistory.length > 0 ? (
+        <LineChart
+          data={bombCountData}
+          width={width}
+          height={220}
+          chartConfig={chartConfig}
+          bezier
+          style={styles.chart}
+          withInnerLines={true}
+          withOuterLines={true}
+          withVerticalLines={false}
+          withHorizontalLines={true}
+          withVerticalLabels={true}
+          withHorizontalLabels={true}
+          fromZero={true}
         />
       ) : (
         <View style={styles.emptyState}>
@@ -155,7 +218,6 @@ const Stats = ({ navigation }: {navigation: any}) => {
         </View>
       )}
     </View>
-
   );
 };
 
@@ -228,6 +290,14 @@ const styles = StyleSheet.create({
     right: 0,
     padding: 8,
     zIndex: 1,
+  },
+  chartTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+    marginTop: 16,
+    marginBottom: 8,
+    paddingHorizontal: 8,
   },
 });
 
