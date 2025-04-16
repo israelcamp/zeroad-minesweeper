@@ -64,10 +64,24 @@ const Stats = ({ navigation }: {navigation: any}) => {
 
   // Prepare data for bomb count performance chart
   const bombCountData = (() => {
-    // Group games by bomb count ranges (bins of 5)
+    // Calculate dynamic bin size based on range
+    const minBombs = Math.min(...gameHistory.map(g => g.bombs));
+    const maxBombs = Math.max(...gameHistory.map(g => g.bombs));
+    const range = maxBombs - minBombs;
+    
+    // Determine bin size based on range
+    let binSize = 5; // default
+    if (range <= 10) binSize = 1;
+    else if (range <= 20) binSize = 2;
+    else if (range <= 30) binSize = 3;
+    else if (range <= 40) binSize = 4;
+    else if (range <= 50) binSize = 5;
+    else binSize = Math.ceil(range / 10); // for very large ranges
+
+    // Group games by bomb count ranges with dynamic bin size
     const bombGroups = gameHistory.reduce((acc, game) => {
-      const binStart = Math.floor(game.bombs / 5) * 5;
-      const binEnd = binStart + 4;
+      const binStart = Math.floor(game.bombs / binSize) * binSize;
+      const binEnd = binStart + binSize - 1;
       const binKey = `${binStart}-${binEnd}`;
       
       if (!acc[binKey]) {
@@ -95,10 +109,11 @@ const Stats = ({ navigation }: {navigation: any}) => {
       datasets: [
         {
           data: sortedBins.map(item => item.avgTime),
-          color: (opacity = 1) => `rgba(128, 128, 128, ${opacity})`,
+          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
           strokeWidth: 2
         }
       ],
+      legend: ["Average Time to Victory (s)"]
     };
   })();
 
