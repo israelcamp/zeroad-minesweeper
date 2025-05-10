@@ -153,15 +153,11 @@ const Stats = ({ navigation }: { navigation: any }) => {
         >
           <Icon name="xmark" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>Game Statistics</Text>
-        <Text style={styles.subtitle}>Performance of your last 50 victories</Text>
+        <Text style={styles.title}>STATISTICS</Text>
+        <Text style={styles.subtitle}>PERFORMANCE OF YOUR LAST 50 VICTORIES</Text>
       </View>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stats.totalGames}</Text>
-          <Text style={styles.statLabel}>Games</Text>
-        </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{stats.averageBombs.toFixed(1)}</Text>
           <Text style={styles.statLabel}>Avg Bombs</Text>
@@ -248,11 +244,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    letterSpacing: 0.5
   },
   subtitle: {
     fontSize: 16,
     color: '#999',
     marginTop: 4,
+    letterSpacing: 0.5
   },
   statsContainer: {
     flexDirection: 'row',
@@ -275,6 +273,8 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   chart: {
     marginLeft: 0,
@@ -289,6 +289,8 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: '#999',
     fontSize: 16,
+    textTransform: "uppercase",
+    letterSpacing: 0.5
   },
   closeButton: {
     position: 'absolute',
@@ -304,6 +306,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     paddingHorizontal: 8,
+    textTransform: "uppercase",
+    letterSpacing: 0.5
   },
 });
 
