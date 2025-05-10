@@ -163,7 +163,10 @@ const Stats = ({ navigation }: { navigation: any }) => {
           <Text style={styles.statLabel}>Avg Bombs</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stats.bestBombs} <BombIcon /></Text>
+          <View style={{ flex: 0, flexDirection: "row", gap: 5 }}>
+            <Text style={styles.statValue}>{stats.bestBombs}</Text>
+            <Icon name="bomb" size={18} color="white" style={{ transform: [{ translateY: 2 }] }} />
+          </View>
           <Text style={styles.statLabel}>Hardest Board</Text>
         </View>
         <View style={styles.statItem}>
