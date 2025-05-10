@@ -86,7 +86,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   const presetFrequency = 0.1;
   const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
-  
+
   const [startTimestamp, setStartTimestamp] = useState<number>(0);
   const [elapsedTimeSinceLastPlay, setElapsedTimeSinceLastPlay] = useState<number>(0);
   const [emoji, setEmoji] = useState<string>(emojis.idle);
@@ -126,7 +126,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       if (didGameStart(state.status)) {
         const timestamp = getTimestamp();
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
-        setElapsedTimeSinceLastPlay(elapsedTimeSinceLastPlay); 
+        setElapsedTimeSinceLastPlay(elapsedTimeSinceLastPlay);
       }
     }, 1000);
     return () => clearInterval(interval_);
@@ -188,12 +188,12 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   }
 
   const endGameState = (state: GameState, status: GameStatus) => {
-    
+
     // Save game record if game ended in victory
     if (status === GameStatus.VICTORY) {
       const elapsedTime = getSecondsDiff(getTimestamp(), startTimestamp);
       const bombsFound = state.grid.filter(cell => cell.isBomb).length;
-      
+
       GameStorage.saveGame({
         timestamp: getTimestamp(),
         bombs: bombsFound,
@@ -201,7 +201,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
         time: elapsedTime
       });
     }
-    
+
     setStartTimestamp(-1);
 
     return {
@@ -258,23 +258,25 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       return;
     vibrate(50);
 
+    if (cell.isBomb) {
+      vibrate(1000);
+      openBombs(state.grid);
+      cell.backgroundColor = backgroundColors.openBomb;
+      const newState = endGameState(state, GameStatus.DEFEAT);
+      setState(newState);
+      return;
+    }
+
     let newState = { ...state };
 
     newState.lastPlay = getTimestamp();
     const newGrid = newState.grid;
 
-    const updatedCell = updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
+    updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
 
     const victory = checkVictory(newGrid);
     if (victory)
       newState = endGameState(newState, GameStatus.VICTORY);
-
-    if (updatedCell.isBomb) {
-      vibrate(1000);
-      openBombs(newState.grid);
-      updatedCell.backgroundColor = backgroundColors.openBomb;
-      newState = endGameState(newState, GameStatus.DEFEAT);
-    };
 
     if (!didGameStart(newState.status) && !didGameEnd(newState.status))
       newState = startGameState(newState, GameStatus.PLAYING);
