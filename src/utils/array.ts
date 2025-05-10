@@ -34,6 +34,13 @@ const bombColors = {
     default: "#000000", // Black for unknown cases
 };
 
+const directions = [
+    [0, 1], [0, -1],
+    [1, 0], [-1, 0],
+    [1, 1], [1, -1],
+    [-1, 1], [-1, -1]
+]
+
 export const backgroundColors = {
     default: "#B0BEC5",
     pressed: "#e0dcdc",
@@ -64,14 +71,13 @@ export const getGridConfig = (
     }
 }
 
-export const getCellText = (cell: GridCell) => (cell.isBomb ? '💣' : cell.bombsAround > 0 ? cell.bombsAround.toString() : "");
+export const getCellText = (cell: GridCell) => (cell.isBomb ? '' : cell.bombsAround > 0 ? cell.bombsAround.toString() : "");
 
 export const generateGrid = (
     gridConfig: GridConfig
 ): GridCell[] => {
 
     const grid: GridCell[] = [];
-
     let index = 0;
     for (let row = 0; row < gridConfig.rows; row++) {
         for (let col = 0; col < gridConfig.columns; col++) {
@@ -95,22 +101,23 @@ export const generateGrid = (
     return calculateGridTexts(grid, gridConfig.rows, gridConfig.columns);
 };
 
-const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => {
-    const directions = [
-        [0, 1], [0, -1],
-        [1, 0], [-1, 0],
-        [1, 1], [1, -1],
-        [-1, 1], [-1, -1]
-    ]
+const indexToRowCol = (index: number, columns: number) => {
+    const rowIndex = Math.floor(index / columns);
+    const colIndex = index % columns;
+    return [rowIndex, colIndex]
+}
 
+const RowColToIndex = (rowIndex: number, colIndex: number, columns: number) => columns * rowIndex + colIndex;
+
+const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => {
+    
     for (let index = 0; index < grid.length; index++) {
         const cell = grid[index];
 
         if (cell.isBomb) continue;
 
         let bombsAround: number = 0;
-        const rowIndex = Math.floor(index / columns);
-        const colIndex = index % columns;
+        const [rowIndex, colIndex] = indexToRowCol(index, columns);
 
         for (const [drow, dcol] of directions) {
             const cRowIndex = rowIndex + drow;
@@ -119,7 +126,7 @@ const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => 
             if (cRowIndex < 0 || cRowIndex >= rows || cColIndex < 0 || cColIndex >= columns)
                 continue;
 
-            bombsAround += Number(grid[columns * cRowIndex + cColIndex].isBomb);
+            bombsAround += Number(grid[RowColToIndex(cRowIndex, cColIndex, columns)].isBomb);
 
         }
 
@@ -133,8 +140,7 @@ export const updateCellsAround = (index: number, grid: GridCell[], rows: number,
 
     if (grid[index].bombsAround > 0 || grid[index].isBomb) return;
 
-    const rowIndex = Math.floor(index / columns);
-    const colIndex = index % columns;
+    const [rowIndex, colIndex] = indexToRowCol(index, columns);
 
     const checkCell = (index: number) => {
         const currentCell = grid[index];
@@ -148,29 +154,15 @@ export const updateCellsAround = (index: number, grid: GridCell[], rows: number,
         if (currentCell.bombsAround === 0) return updateCellsAround(index, grid, rows, columns);
     }
 
-    // check if there is top left
-    if (colIndex != 0 && rowIndex > 0) checkCell(index - columns - 1);
+    for (const [drow, dcol] of directions) {
+        const cRowIndex = rowIndex + drow;
+        const cColIndex = colIndex + dcol;
 
-    // check top mid
-    if (rowIndex > 0) checkCell(index - columns);
+        if (cRowIndex < 0 || cRowIndex >= rows || cColIndex < 0 || cColIndex >= columns)
+            continue;
 
-    // top right
-    if (colIndex != columns - 1 && rowIndex > 0) checkCell(index - columns + 1);
-
-    // mid left
-    if (colIndex > 0) checkCell(index - 1);
-
-    // mid right
-    if (colIndex < columns - 1) checkCell(index + 1);
-
-    // bottom left
-    if (rowIndex < rows - 1 && colIndex > 0) checkCell(index + columns - 1);
-
-    // bottom mid
-    if (rowIndex < rows - 1) checkCell(index + columns);
-
-    // bottom right
-    if (rowIndex < rows - 1 && colIndex < columns - 1) checkCell(index + columns + 1);
+        checkCell(RowColToIndex(cRowIndex, cColIndex, columns));
+    }
 }
 
 export const checkVictory = (grid: GridCell[]) => {
@@ -186,7 +178,6 @@ export const checkVictory = (grid: GridCell[]) => {
 export const openBombs = (grid: GridCell[]) => {
     for (const cell of grid) {
         if (cell.isBomb && !cell.hasFlag) {
-            cell.text = '💣';
             cell.pressed = true;
             cell.backgroundColor = backgroundColors.pressed;
         }
