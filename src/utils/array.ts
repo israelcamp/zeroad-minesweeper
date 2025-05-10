@@ -96,6 +96,13 @@ export const generateGrid = (
 };
 
 const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => {
+    const directions = [
+        [0, 1], [0, -1],
+        [1, 0], [-1, 0],
+        [1, 1], [1, -1],
+        [-1, 1], [-1, -1]
+    ]
+
     for (let index = 0; index < grid.length; index++) {
         const cell = grid[index];
 
@@ -105,29 +112,16 @@ const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => 
         const rowIndex = Math.floor(index / columns);
         const colIndex = index % columns;
 
-        // check if there is top left
-        if (colIndex != 0 && rowIndex > 0 && grid[index - columns - 1].isBomb) bombsAround++;
+        for (const [drow, dcol] of directions) {
+            const cRowIndex = rowIndex + drow;
+            const cColIndex = colIndex + dcol;
 
-        // check top mid
-        if (rowIndex > 0 && grid[index - columns].isBomb) bombsAround++;
+            if (cRowIndex < 0 || cRowIndex >= rows || cColIndex < 0 || cColIndex >= columns)
+                continue;
 
-        // top right
-        if (colIndex != columns - 1 && rowIndex > 0 && grid[index - columns + 1].isBomb) bombsAround++;
+            bombsAround += Number(grid[columns * cRowIndex + cColIndex].isBomb);
 
-        // mid left
-        if (colIndex > 0 && grid[index - 1].isBomb) bombsAround++;
-
-        // mid right
-        if (colIndex < columns - 1 && grid[index + 1].isBomb) bombsAround++;
-
-        // bottom left
-        if (rowIndex < rows - 1 && colIndex > 0 && grid[index + columns - 1].isBomb) bombsAround++;
-
-        // bottom mid
-        if (rowIndex < rows - 1 && grid[index + columns].isBomb) bombsAround++;
-
-        // bottom right
-        if (rowIndex < rows - 1 && colIndex < columns - 1 && grid[index + columns + 1].isBomb) bombsAround++;
+        }
 
         cell.bombsAround = bombsAround;
         cell.textColor = bombColors[bombsAround] || bombColors.default;
