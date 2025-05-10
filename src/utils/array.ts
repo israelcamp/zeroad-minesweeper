@@ -110,7 +110,7 @@ const indexToRowCol = (index: number, columns: number) => {
 const RowColToIndex = (rowIndex: number, colIndex: number, columns: number) => columns * rowIndex + colIndex;
 
 const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => {
-    
+
     for (let index = 0; index < grid.length; index++) {
         const cell = grid[index];
 
@@ -140,33 +140,34 @@ export const updateCellsAround = (index: number, grid: GridCell[], rows: number,
     const startingCell = grid[index];
     let currentCells = [startingCell];
 
-    while (currentCells.length > 0) {
+    let loopCount = 0;
+    while (currentCells.length > 0 && loopCount < rows * columns) {
         const nextCells = [];
 
         for (const cell of currentCells) {
             if (cell.pressed || cell.hasFlag) continue;
-            
+
             // Reveal the current cell
             cell.text = getCellText(cell);
             cell.pressed = true;
             cell.backgroundColor = backgroundColors.pressed;
-            
+
             // Only continue expanding if this is an empty cell (bombsAround === 0)
             if (cell.bombsAround !== 0) continue;
 
             const [rowIndex, colIndex] = indexToRowCol(cell.index, columns);
-            
+
             for (const [drow, dcol] of directions) {
                 const cRowIndex = rowIndex + drow;
                 const cColIndex = colIndex + dcol;
-        
+
                 if (cRowIndex < 0 || cRowIndex >= rows || cColIndex < 0 || cColIndex >= columns)
                     continue;
-        
+
                 nextCells.push(grid[RowColToIndex(cRowIndex, cColIndex, columns)]);
             }
         }
-        
+        loopCount++;
         currentCells = nextCells;
     }
     return startingCell;
