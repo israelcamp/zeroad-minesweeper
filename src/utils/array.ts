@@ -137,32 +137,39 @@ const calculateGridTexts = (grid: GridCell[], rows: number, columns: number) => 
 }
 
 export const updateCellsAround = (index: number, grid: GridCell[], rows: number, columns: number) => {
+    const startingCell = grid[index];
+    let currentCells = [startingCell];
 
-    if (grid[index].bombsAround > 0 || grid[index].isBomb) return;
+    while (currentCells.length > 0) {
+        const nextCells = [];
 
-    const [rowIndex, colIndex] = indexToRowCol(index, columns);
+        for (const cell of currentCells) {
+            if (cell.pressed || cell.hasFlag) continue;
+            
+            // Reveal the current cell
+            cell.text = getCellText(cell);
+            cell.pressed = true;
+            cell.backgroundColor = backgroundColors.pressed;
+            
+            // Only continue expanding if this is an empty cell (bombsAround === 0)
+            if (cell.bombsAround !== 0) continue;
 
-    const checkCell = (index: number) => {
-        const currentCell = grid[index];
-        const alreadyPressed = currentCell.pressed;
-        if (alreadyPressed || currentCell.hasFlag) return;
-        if (!currentCell.isBomb) {
-            currentCell.text = getCellText(currentCell);
-            currentCell.pressed = true;
-            currentCell.backgroundColor = backgroundColors.pressed;
+            const [rowIndex, colIndex] = indexToRowCol(cell.index, columns);
+            
+            for (const [drow, dcol] of directions) {
+                const cRowIndex = rowIndex + drow;
+                const cColIndex = colIndex + dcol;
+        
+                if (cRowIndex < 0 || cRowIndex >= rows || cColIndex < 0 || cColIndex >= columns)
+                    continue;
+        
+                nextCells.push(grid[RowColToIndex(cRowIndex, cColIndex, columns)]);
+            }
         }
-        if (currentCell.bombsAround === 0) return updateCellsAround(index, grid, rows, columns);
+        
+        currentCells = nextCells;
     }
-
-    for (const [drow, dcol] of directions) {
-        const cRowIndex = rowIndex + drow;
-        const cColIndex = colIndex + dcol;
-
-        if (cRowIndex < 0 || cRowIndex >= rows || cColIndex < 0 || cColIndex >= columns)
-            continue;
-
-        checkCell(RowColToIndex(cRowIndex, cColIndex, columns));
-    }
+    return startingCell;
 }
 
 export const checkVictory = (grid: GridCell[]) => {

@@ -259,19 +259,11 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
     vibrate(50);
 
     let newState = { ...state };
+
     newState.lastPlay = getTimestamp();
+    const newGrid = newState.grid;
 
-    const updatedCell = {
-      ...cell,
-      pressed: true,
-      text: getCellText(cell),
-      backgroundColor: backgroundColors.pressed
-    };
-    const newGrid = newState.grid
-    newGrid[index] = updatedCell;
-
-    updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
-    newState.grid = newGrid;
+    const updatedCell = updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
 
     const victory = checkVictory(newGrid);
     if (victory)
