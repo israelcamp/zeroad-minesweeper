@@ -155,14 +155,13 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       setEmoji(emojis.defeat);
     } else if (state.status === GameStatus.VICTORY) {
       setEmoji(emojis.victory);
-    } else if (elapsedTimeSinceLastPlay >= 5) {
+    } else if (elapsedTimeSinceLastPlay >= 10) {
       setEmoji(emojis.waiting);
     } else if (didGameStart(state.status)) {
       setEmoji(emojis.playing);
     } else {
       setEmoji(emojis.idle);
     }
-
   }, [state, showSlider, elapsedTimeSinceLastPlay]);
 
   useEffect(() => {
@@ -211,11 +210,12 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   };
 
   const startGameState = (state: GameState, status: GameStatus) => {
-    setStartTimestamp(getTimestamp());
+    const timestamp = getTimestamp();
+    setStartTimestamp(timestamp);
     return {
       ...state,
       status,
-      lastPlay: getTimestamp(),
+      lastPlay: timestamp,
     }
   };
 
@@ -268,8 +268,6 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
     }
 
     let newState = { ...state };
-
-    newState.lastPlay = getTimestamp();
     const newGrid = newState.grid;
 
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
@@ -281,6 +279,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
     if (!didGameStart(newState.status) && !didGameEnd(newState.status))
       newState = startGameState(newState, GameStatus.PLAYING);
 
+    newState.lastPlay = getTimestamp();
     setState(newState);
   };
 
