@@ -5,8 +5,6 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import { getScreenSize } from './utils/dimension';
 import { GameStorage, GameRecord } from './utils/storage';
 
-const BombIcon = () => <Icon name="bomb" size={18} color="white" />;
-
 const Stats = ({ navigation }: { navigation: any }) => {
   const { width } = getScreenSize();
   const [gameHistory, setGameHistory] = useState<GameRecord[]>([]);
