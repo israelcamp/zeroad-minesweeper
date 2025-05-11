@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
-import { MMKVLoader } from 'react-native-mmkv-storage';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import { getScreenSize } from './utils/dimension';
@@ -24,7 +23,6 @@ import {
   GridCell,
   updateCellsAround,
   checkVictory,
-  getCellText,
   GridConfig,
   getGridConfig,
   openBombs,
@@ -73,8 +71,6 @@ const vibrate = (duration: number) => Vibration.vibrate(duration);
 const didGameStart = (status: GameStatus) => status === GameStatus.PLAYING;
 const didGameEnd = (status: GameStatus) => status === GameStatus.DEFEAT || status === GameStatus.VICTORY;
 
-const storage = new MMKVLoader().initialize();
-
 function Game({ navigation }: { navigation: any }): React.JSX.Element {
   useKeepAwake();
 
@@ -86,7 +82,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   const presetFrequency = 0.1;
   const presetGridConfig = getGridConfig(width, boardHeight, safePadding, columns, presetFrequency);
 
-  
+
   const [startTimestamp, setStartTimestamp] = useState<number>(0);
   const [elapsedTimeSinceLastPlay, setElapsedTimeSinceLastPlay] = useState<number>(0);
   const [emoji, setEmoji] = useState<string>(emojis.idle);
@@ -106,19 +102,19 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
 
   useEffect(() => {
     const fetchInitialFrequency = async () => {
-      const initialFrequency = await storage.getIntAsync('frequency');
+      const initialFrequency = await GameStorage.getFrequency();
       if (initialFrequency) {
         setFrequency(initialFrequency);
         setGridConfig({ ...gridConfig, frequency: initialFrequency });
       } else {
-        storage.setIntAsync('frequency', presetFrequency);
+        GameStorage.setFrequency(presetFrequency);
       }
     }
     fetchInitialFrequency();
   }, []);
 
   useEffect(() => {
-    storage.setIntAsync('frequency', frequency);
+    GameStorage.setFrequency(frequency);
   }, [gridConfig]);
 
   useEffect(() => {
@@ -126,7 +122,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       if (didGameStart(state.status)) {
         const timestamp = getTimestamp();
         const elapsedTimeSinceLastPlay = getSecondsDiff(timestamp, state.lastPlay);
-        setElapsedTimeSinceLastPlay(elapsedTimeSinceLastPlay); 
+        setElapsedTimeSinceLastPlay(elapsedTimeSinceLastPlay);
       }
     }, 1000);
     return () => clearInterval(interval_);
@@ -155,14 +151,13 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       setEmoji(emojis.defeat);
     } else if (state.status === GameStatus.VICTORY) {
       setEmoji(emojis.victory);
-    } else if (elapsedTimeSinceLastPlay >= 5) {
+    } else if (elapsedTimeSinceLastPlay >= 10) {
       setEmoji(emojis.waiting);
     } else if (didGameStart(state.status)) {
       setEmoji(emojis.playing);
     } else {
       setEmoji(emojis.idle);
     }
-
   }, [state, showSlider, elapsedTimeSinceLastPlay]);
 
   useEffect(() => {
@@ -188,12 +183,12 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   }
 
   const endGameState = (state: GameState, status: GameStatus) => {
-    
+
     // Save game record if game ended in victory
     if (status === GameStatus.VICTORY) {
       const elapsedTime = getSecondsDiff(getTimestamp(), startTimestamp);
       const bombsFound = state.grid.filter(cell => cell.isBomb).length;
-      
+
       GameStorage.saveGame({
         timestamp: getTimestamp(),
         bombs: bombsFound,
@@ -201,7 +196,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
         time: elapsedTime
       });
     }
-    
+
     setStartTimestamp(-1);
 
     return {
@@ -211,11 +206,12 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   };
 
   const startGameState = (state: GameState, status: GameStatus) => {
-    setStartTimestamp(getTimestamp());
+    const timestamp = getTimestamp();
+    setStartTimestamp(timestamp);
     return {
       ...state,
       status,
-      lastPlay: getTimestamp(),
+      lastPlay: timestamp,
     }
   };
 
@@ -258,35 +254,28 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       return;
     vibrate(50);
 
-    let newState = { ...state };
-    newState.lastPlay = getTimestamp();
+    if (cell.isBomb) {
+      vibrate(1000);
+      openBombs(state.grid);
+      cell.backgroundColor = backgroundColors.openBomb;
+      const newState = endGameState(state, GameStatus.DEFEAT);
+      setState(newState);
+      return;
+    }
 
-    const updatedCell = {
-      ...cell,
-      pressed: true,
-      text: getCellText(cell),
-      backgroundColor: backgroundColors.pressed
-    };
-    const newGrid = newState.grid
-    newGrid[index] = updatedCell;
+    let newState = { ...state };
+    const newGrid = newState.grid;
 
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
-    newState.grid = newGrid;
 
     const victory = checkVictory(newGrid);
     if (victory)
       newState = endGameState(newState, GameStatus.VICTORY);
 
-    if (updatedCell.isBomb) {
-      vibrate(1000);
-      openBombs(newState.grid);
-      updatedCell.backgroundColor = backgroundColors.openBomb;
-      newState = endGameState(newState, GameStatus.DEFEAT);
-    };
-
     if (!didGameStart(newState.status) && !didGameEnd(newState.status))
       newState = startGameState(newState, GameStatus.PLAYING);
 
+    newState.lastPlay = getTimestamp();
     setState(newState);
   };
 

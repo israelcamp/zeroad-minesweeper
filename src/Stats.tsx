@@ -5,7 +5,7 @@ import Icon from "react-native-vector-icons/FontAwesome6";
 import { getScreenSize } from './utils/dimension';
 import { GameStorage, GameRecord } from './utils/storage';
 
-const Stats = ({ navigation }: {navigation: any}) => {
+const Stats = ({ navigation }: { navigation: any }) => {
   const { width } = getScreenSize();
   const [gameHistory, setGameHistory] = useState<GameRecord[]>([]);
   const [stats, setStats] = useState({
@@ -28,7 +28,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
       history.sort((a, b) => a.timestamp - b.timestamp);
 
       const gameStats = await GameStorage.getStats(history);
-      
+
       setGameHistory(history);
       setStats(gameStats);
     } catch (error) {
@@ -43,7 +43,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
-  
+
   // Prepare data for time progression chart
   const timeData = {
     labels: gameHistory.map((game, index) => {
@@ -68,7 +68,7 @@ const Stats = ({ navigation }: {navigation: any}) => {
     const minBombs = Math.min(...gameHistory.map(g => g.bombs));
     const maxBombs = Math.max(...gameHistory.map(g => g.bombs));
     const range = maxBombs - minBombs;
-    
+
     // Determine bin size based on range
     let binSize = 5; // default
     if (range <= 10) binSize = 1;
@@ -82,8 +82,9 @@ const Stats = ({ navigation }: {navigation: any}) => {
     const bombGroups = gameHistory.reduce((acc, game) => {
       const binStart = Math.floor(game.bombs / binSize) * binSize;
       const binEnd = binStart + binSize - 1;
-      const binKey = `${binStart}-${binEnd}`;
-      
+      const binRange = binEnd - binStart;
+      const binKey = binRange > 0 ? `${binStart}-${binEnd}` : `${binStart}`;
+
       if (!acc[binKey]) {
         acc[binKey] = { total: 0, count: 0 };
       }
@@ -117,15 +118,11 @@ const Stats = ({ navigation }: {navigation: any}) => {
   })();
 
   const chartConfig = {
-    backgroundColor: '#1a1a1a',
     backgroundGradientFrom: '#2a2a2a',
     backgroundGradientTo: '#1a1a1a',
     decimalPlaces: 0,
     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-    style: {
-      borderRadius: 16,
-    },
     propsForDots: {
       r: '4',
       strokeWidth: '2',
@@ -148,40 +145,40 @@ const Stats = ({ navigation }: {navigation: any}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.closeButton}
           onPress={() => navigation.goBack()}
         >
           <Icon name="xmark" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>Game Statistics</Text>
-        <Text style={styles.subtitle}>Performance of your last 50 games</Text>
+        <Text style={styles.title}>STATISTICS</Text>
+        <Text style={styles.subtitle}>PERFORMANCE OF YOUR LAST 50 VICTORIES</Text>
       </View>
 
       <View style={styles.statsContainer}>
-        <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stats.totalGames}</Text>
-          <Text style={styles.statLabel}>Games</Text>
-        </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{stats.averageBombs.toFixed(1)}</Text>
           <Text style={styles.statLabel}>Avg Bombs</Text>
         </View>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{stats.bestBombs}</Text>
-          <Text style={styles.statLabel}>Best</Text>
+          <View style={{ flex: 0, flexDirection: "row", gap: 5 }}>
+            <Text style={styles.statValue}>{stats.bestBombs}</Text>
+            <Icon name="bomb" size={18} color="white" style={{ transform: [{ translateY: 2 }] }} />
+          </View>
+          <Text style={styles.statLabel}>Hardest Board</Text>
         </View>
         <View style={styles.statItem}>
           <Text style={styles.statValue}>{formatTime(stats.bestTime)}</Text>
-          <Text style={styles.statLabel}>Best Time</Text>
+          <Text style={styles.statLabel}>Lowest Time</Text>
         </View>
       </View>
 
       <Text style={styles.chartTitle}>Time to Victory Over Time</Text>
       {gameHistory.length > 0 ? (
         <LineChart
+          yLabelsOffset={30}
           data={timeData}
-          width={width}
+          width={width - 20}
           height={220}
           chartConfig={chartConfig}
           bezier
@@ -203,8 +200,9 @@ const Stats = ({ navigation }: {navigation: any}) => {
       <Text style={styles.chartTitle}>Average Time by Bomb Count</Text>
       {gameHistory.length > 0 ? (
         <LineChart
+          yLabelsOffset={30}
           data={bombCountData}
-          width={width}
+          width={width - 20}
           height={220}
           chartConfig={chartConfig}
           bezier
@@ -247,11 +245,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
+    letterSpacing: 0.5
   },
   subtitle: {
     fontSize: 16,
     color: '#999',
     marginTop: 4,
+    letterSpacing: 0.5
   },
   statsContainer: {
     flexDirection: 'row',
@@ -274,9 +274,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
   },
   chart: {
-    marginLeft:-32,
+    marginLeft: 0,
     padding: 0,
     borderRadius: 16,
   },
@@ -288,6 +290,8 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: '#999',
     fontSize: 16,
+    textTransform: "uppercase",
+    letterSpacing: 0.5
   },
   closeButton: {
     position: 'absolute',
@@ -303,6 +307,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     paddingHorizontal: 8,
+    textTransform: "uppercase",
+    letterSpacing: 0.5
   },
 });
 

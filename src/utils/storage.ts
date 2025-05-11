@@ -11,6 +11,23 @@ const MAX_GAMES = 50;
 const storage = new MMKVLoader().initialize();
 
 export const GameStorage = {
+
+  getFrequency: async (): Promise<number | undefined | null> => {
+    try {
+      const frequency = await storage.getIntAsync('frequency');
+      return frequency;
+    } catch (error) {
+      console.error('Error getting frequency:', error);
+      return undefined; // Default frequency if error occurs
+    }
+  },
+  setFrequency: async (frequency: number): Promise<void> => {
+    try {
+      await storage.setIntAsync('frequency', frequency);
+    } catch (error) {
+      console.error('Error setting frequency:', error);
+    }
+  },
   /**
    * Save a new game record and maintain only the most recent MAX_GAMES
    */
@@ -18,17 +35,17 @@ export const GameStorage = {
     try {
       // Get current history
       const history = await GameStorage.getGameHistory();
-      
+
       // Add new record to the beginning (most recent first)
       const updatedHistory = [record, ...history].slice(0, MAX_GAMES);
-      
+
       // Save updated history
       await storage.setStringAsync('gameHistory', JSON.stringify(updatedHistory));
     } catch (error) {
       console.error('Error saving game record:', error);
     }
   },
-  
+
   /**
    * Get the game history (up to MAX_GAMES)
    */
@@ -41,7 +58,7 @@ export const GameStorage = {
       return [];
     }
   },
-  
+
   /**
    * Clear all game history
    */
@@ -52,7 +69,7 @@ export const GameStorage = {
       console.error('Error clearing game history:', error);
     }
   },
-  
+
   /**
    * Get summary statistics
    */
@@ -63,7 +80,7 @@ export const GameStorage = {
     averageTime: number;
     bestTime: number;
   }> => {
-    
+
     if (history.length === 0) {
       return {
         totalGames: 0,
@@ -73,12 +90,12 @@ export const GameStorage = {
         bestTime: 0
       };
     }
-    
+
     const totalBombs = history.reduce((sum, game) => sum + game.bombs, 0);
     const totalTime = history.reduce((sum, game) => sum + game.time, 0);
     const bestBombs = Math.max(...history.map(game => game.bombs));
     const bestTime = Math.min(...history.map(game => game.time));
-    
+
     return {
       totalGames: history.length,
       averageBombs: totalBombs / history.length,
