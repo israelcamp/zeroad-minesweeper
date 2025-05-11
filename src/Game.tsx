@@ -15,7 +15,6 @@ import {
 } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import IconMaterial from "react-native-vector-icons/MaterialCommunityIcons";
-import { MMKVLoader } from 'react-native-mmkv-storage';
 import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 import { getScreenSize } from './utils/dimension';
@@ -24,7 +23,6 @@ import {
   GridCell,
   updateCellsAround,
   checkVictory,
-  getCellText,
   GridConfig,
   getGridConfig,
   openBombs,
@@ -73,8 +71,6 @@ const vibrate = (duration: number) => Vibration.vibrate(duration);
 const didGameStart = (status: GameStatus) => status === GameStatus.PLAYING;
 const didGameEnd = (status: GameStatus) => status === GameStatus.DEFEAT || status === GameStatus.VICTORY;
 
-const storage = new MMKVLoader().initialize();
-
 function Game({ navigation }: { navigation: any }): React.JSX.Element {
   useKeepAwake();
 
@@ -106,19 +102,19 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
 
   useEffect(() => {
     const fetchInitialFrequency = async () => {
-      const initialFrequency = await storage.getIntAsync('frequency');
+      const initialFrequency = await GameStorage.getFrequency();
       if (initialFrequency) {
         setFrequency(initialFrequency);
         setGridConfig({ ...gridConfig, frequency: initialFrequency });
       } else {
-        storage.setIntAsync('frequency', presetFrequency);
+        GameStorage.setFrequency(presetFrequency);
       }
     }
     fetchInitialFrequency();
   }, []);
 
   useEffect(() => {
-    storage.setIntAsync('frequency', frequency);
+    GameStorage.setFrequency(frequency);
   }, [gridConfig]);
 
   useEffect(() => {
