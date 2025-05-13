@@ -28,14 +28,14 @@ const AnimatedEmoji = () => {
     }, [bounceValue]);
 
     return (
-        <View style={{ position: 'absolute', zIndex: 10, top: '50%', left: '50%', transform: [{ translateX: -40 }, { translateY: -25 }] }}>
+        <View style={{ position: 'absolute', zIndex: 10, top: '50%', left: '50%', transform: [{ translateX: -45 }, { translateY: -25 }] }}>
             <Animated.Text
                 style={{
-                    fontSize: 80,
+                    fontSize: 70,
                     transform: [{ translateY: bounceValue }],
                 }}
             >
-                🎉
+                🏆
             </Animated.Text>
         </View>
     );
