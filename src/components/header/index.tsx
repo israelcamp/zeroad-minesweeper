@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         justifyContent: "space-between", // Keeps the two timers apart
-        alignItems: "center",
+        alignItems: "flex-end",
         paddingTop: '1%',
         paddingRight: '8%',
         paddingLeft: '8%',

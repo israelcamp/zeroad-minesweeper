@@ -76,7 +76,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   useKeepAwake();
 
   const { width, height } = getScreenSize();
-  const headerHeight = 60;
+  const headerHeight = 80;
   const boardHeight = height - headerHeight;
   const safePadding = 0;
   const columns = 11;

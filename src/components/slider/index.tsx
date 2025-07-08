@@ -44,7 +44,7 @@ export const Slider: React.FC<SliderProps> = ({
       <View style={{
         padding: 15,
         position: 'absolute',
-        top: 80,
+        top: 110,
         left: '50%',
         transform: [{ translateX: -145 }],
         backgroundColor: 'white',
