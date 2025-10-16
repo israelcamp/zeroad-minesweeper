@@ -1,19 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
-import { LineChart } from 'react-native-chart-kit';
-import Icon from "react-native-vector-icons/FontAwesome6";
-import { getScreenSize } from './utils/dimension';
-import { GameStorage, GameRecord } from './utils/storage';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import {LineChart} from 'react-native-chart-kit';
+import Icon from 'react-native-vector-icons/FontAwesome6';
+import {getScreenSize} from './utils/dimension';
+import {GameStorage, GameRecord} from './utils/storage';
 
-const Stats = ({ navigation }: { navigation: any }) => {
-  const { width } = getScreenSize();
+const Stats = ({navigation}: {navigation: any}) => {
+  const {width} = getScreenSize();
   const [gameHistory, setGameHistory] = useState<GameRecord[]>([]);
   const [stats, setStats] = useState({
     totalGames: 0,
     averageBombs: 0,
     bestBombs: 0,
     averageTime: 0,
-    bestTime: 0
+    bestTime: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -57,8 +63,8 @@ const Stats = ({ navigation }: { navigation: any }) => {
       {
         data: gameHistory.map(game => game.time),
         color: (opacity = 1) => `rgba(128, 128, 128, ${opacity})`,
-        strokeWidth: 2
-      }
+        strokeWidth: 2,
+      },
     ],
   };
 
@@ -79,25 +85,28 @@ const Stats = ({ navigation }: { navigation: any }) => {
     else binSize = Math.ceil(range / 10); // for very large ranges
 
     // Group games by bomb count ranges with dynamic bin size
-    const bombGroups = gameHistory.reduce((acc, game) => {
-      const binStart = Math.floor(game.bombs / binSize) * binSize;
-      const binEnd = binStart + binSize - 1;
-      const binRange = binEnd - binStart;
-      const binKey = binRange > 0 ? `${binStart}-${binEnd}` : `${binStart}`;
+    const bombGroups = gameHistory.reduce(
+      (acc, game) => {
+        const binStart = Math.floor(game.bombs / binSize) * binSize;
+        const binEnd = binStart + binSize - 1;
+        const binRange = binEnd - binStart;
+        const binKey = binRange > 0 ? `${binStart}-${binEnd}` : `${binStart}`;
 
-      if (!acc[binKey]) {
-        acc[binKey] = { total: 0, count: 0 };
-      }
-      acc[binKey].total += game.time;
-      acc[binKey].count += 1;
-      return acc;
-    }, {} as Record<string, { total: number; count: number }>);
+        if (!acc[binKey]) {
+          acc[binKey] = {total: 0, count: 0};
+        }
+        acc[binKey].total += game.time;
+        acc[binKey].count += 1;
+        return acc;
+      },
+      {} as Record<string, {total: number; count: number}>,
+    );
 
     // Convert to array and sort by bin start
     const sortedBins = Object.entries(bombGroups)
       .map(([bin, data]) => ({
         bin,
-        avgTime: data.total / data.count
+        avgTime: data.total / data.count,
       }))
       .sort((a, b) => {
         const aStart = parseInt(a.bin.split('-')[0]);
@@ -111,8 +120,8 @@ const Stats = ({ navigation }: { navigation: any }) => {
         {
           data: sortedBins.map(item => item.avgTime),
           color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          strokeWidth: 2
-        }
+          strokeWidth: 2,
+        },
       ],
     };
   })();
@@ -126,12 +135,12 @@ const Stats = ({ navigation }: { navigation: any }) => {
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: '#4a9eff'
+      stroke: '#4a9eff',
     },
     propsForBackgroundLines: {
       stroke: '#404040',
-      strokeWidth: 1
-    }
+      strokeWidth: 1,
+    },
   };
 
   if (loading) {
@@ -147,12 +156,13 @@ const Stats = ({ navigation }: { navigation: any }) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.closeButton}
-          onPress={() => navigation.goBack()}
-        >
+          onPress={() => navigation.goBack()}>
           <Icon name="xmark" size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.title}>STATISTICS</Text>
-        <Text style={styles.subtitle}>PERFORMANCE OF YOUR LAST 50 VICTORIES</Text>
+        <Text style={styles.subtitle}>
+          PERFORMANCE OF YOUR LAST 50 VICTORIES
+        </Text>
       </View>
 
       <View style={styles.statsContainer}>
@@ -161,9 +171,14 @@ const Stats = ({ navigation }: { navigation: any }) => {
           <Text style={styles.statLabel}>Avg Bombs</Text>
         </View>
         <View style={styles.statItem}>
-          <View style={{ flex: 0, flexDirection: "row", gap: 5 }}>
+          <View style={{flex: 0, flexDirection: 'row', gap: 5}}>
             <Text style={styles.statValue}>{stats.bestBombs}</Text>
-            <Icon name="bomb" size={18} color="white" style={{ transform: [{ translateY: 2 }] }} />
+            <Icon
+              name="bomb"
+              size={18}
+              color="white"
+              style={{transform: [{translateY: 2}]}}
+            />
           </View>
           <Text style={styles.statLabel}>Hardest Board</Text>
         </View>
@@ -228,6 +243,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#1a1a1a',
+    paddingTop: 40,
     padding: 8,
   },
   loadingContainer: {
@@ -245,13 +261,13 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: '#fff',
-    letterSpacing: 0.5
+    letterSpacing: 0.5,
   },
   subtitle: {
     fontSize: 16,
     color: '#999',
     marginTop: 4,
-    letterSpacing: 0.5
+    letterSpacing: 0.5,
   },
   statsContainer: {
     flexDirection: 'row',
@@ -274,7 +290,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 4,
-    textTransform: "uppercase",
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   chart: {
@@ -290,8 +306,8 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: '#999',
     fontSize: 16,
-    textTransform: "uppercase",
-    letterSpacing: 0.5
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   closeButton: {
     position: 'absolute',
@@ -307,8 +323,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     paddingHorizontal: 8,
-    textTransform: "uppercase",
-    letterSpacing: 0.5
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });
 

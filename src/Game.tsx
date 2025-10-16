@@ -32,6 +32,7 @@ import { Slider, Difficulty } from './components/slider';
 import { Header } from './components/header';
 import { MessageBubble } from './components/messageBubble';
 import { GameStorage } from './utils/storage';
+import AnimatedEmoji from './components/confettis';
 
 const emojis = {
   playing: '🧐',
@@ -75,7 +76,7 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   useKeepAwake();
 
   const { width, height } = getScreenSize();
-  const headerHeight = 60;
+  const headerHeight = 80;
   const boardHeight = height - headerHeight;
   const safePadding = 0;
   const columns = 11;
@@ -269,8 +270,11 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
     updateCellsAround(index, newGrid, gridConfig.rows, gridConfig.columns);
 
     const victory = checkVictory(newGrid);
-    if (victory)
+    if (victory) {
+      vibrate(200);
+      vibrate(200);
       newState = endGameState(newState, GameStatus.VICTORY);
+    }
 
     if (!didGameStart(newState.status) && !didGameEnd(newState.status))
       newState = startGameState(newState, GameStatus.PLAYING);
@@ -355,7 +359,8 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
       {gridView()}
       {didGameEnd(state.status) ? messageBubble() : <></>}
       {showSlider ? slider() : <></>}
-    </View >
+      {state.status === GameStatus.VICTORY ? <AnimatedEmoji /> : <> </>}
+    </View>
   );
 }
 

@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     messageBubbleContainer: {
         alignItems: 'center',
         position: 'absolute',
-        top: 45,
+        top: 68,
         left: '50%',
         transform: [{ translateX: -75 }]
       },

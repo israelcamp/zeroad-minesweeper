@@ -88,8 +88,8 @@ android {
         applicationId "com.appisnotnone.minesweeper"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 6
-        versionName "1.4.0"
+        versionCode 10
+        versionName "2.0.0"
     }
     signingConfigs {
         release {
@@ -115,6 +115,12 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+    }
+    
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = false
         }
     }
 }
