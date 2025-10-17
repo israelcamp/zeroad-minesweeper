@@ -102,8 +102,8 @@ function Game({ navigation }: { navigation: any }): React.JSX.Element {
   const [remainingBombs, setRemainingBombs] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchInitialFrequency = async () => {
-      const initialFrequency = await GameStorage.getFrequency();
+    const fetchInitialFrequency = () => {
+      const initialFrequency = GameStorage.getFrequency();
       if (initialFrequency) {
         setFrequency(initialFrequency);
         setGridConfig({ ...gridConfig, frequency: initialFrequency });

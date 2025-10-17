@@ -30,10 +30,10 @@ const Stats = ({navigation}: {navigation: any}) => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const history = await GameStorage.getGameHistory();
+      const history = GameStorage.getGameHistory();
       history.sort((a, b) => a.timestamp - b.timestamp);
 
-      const gameStats = await GameStorage.getStats(history);
+      const gameStats = GameStorage.getStats(history);
 
       setGameHistory(history);
       setStats(gameStats);

@@ -1,4 +1,4 @@
-import { MMKVLoader } from 'react-native-mmkv-storage';
+import { MMKV } from 'react-native-mmkv';
 
 export interface GameRecord {
   timestamp: number;
@@ -8,22 +8,22 @@ export interface GameRecord {
 }
 
 const MAX_GAMES = 50;
-const storage = new MMKVLoader().initialize();
+const storage = new MMKV();
 
 export const GameStorage = {
 
-  getFrequency: async (): Promise<number | undefined | null> => {
+  getFrequency: (): number | undefined => {
     try {
-      const frequency = await storage.getIntAsync('frequency');
+      const frequency = storage.getNumber('frequency');
       return frequency;
     } catch (error) {
       console.error('Error getting frequency:', error);
       return undefined; // Default frequency if error occurs
     }
   },
-  setFrequency: async (frequency: number): Promise<void> => {
+  setFrequency: (frequency: number): void => {
     try {
-      await storage.setIntAsync('frequency', frequency);
+      storage.set('frequency', frequency);
     } catch (error) {
       console.error('Error setting frequency:', error);
     }
@@ -31,16 +31,16 @@ export const GameStorage = {
   /**
    * Save a new game record and maintain only the most recent MAX_GAMES
    */
-  saveGame: async (record: GameRecord): Promise<void> => {
+  saveGame: (record: GameRecord): void => {
     try {
       // Get current history
-      const history = await GameStorage.getGameHistory();
+      const history = GameStorage.getGameHistory();
 
       // Add new record to the beginning (most recent first)
       const updatedHistory = [record, ...history].slice(0, MAX_GAMES);
 
       // Save updated history
-      await storage.setStringAsync('gameHistory', JSON.stringify(updatedHistory));
+      storage.set('gameHistory', JSON.stringify(updatedHistory));
     } catch (error) {
       console.error('Error saving game record:', error);
     }
@@ -49,9 +49,9 @@ export const GameStorage = {
   /**
    * Get the game history (up to MAX_GAMES)
    */
-  getGameHistory: async (): Promise<GameRecord[]> => {
+  getGameHistory: (): GameRecord[] => {
     try {
-      const historyJson = await storage.getStringAsync('gameHistory');
+      const historyJson = storage.getString('gameHistory');
       return historyJson ? JSON.parse(historyJson) : [];
     } catch (error) {
       console.error('Error getting game history:', error);
@@ -62,9 +62,9 @@ export const GameStorage = {
   /**
    * Clear all game history
    */
-  clearHistory: async (): Promise<void> => {
+  clearHistory: (): void => {
     try {
-      await storage.removeItem('gameHistory');
+      storage.delete('gameHistory');
     } catch (error) {
       console.error('Error clearing game history:', error);
     }
@@ -73,13 +73,13 @@ export const GameStorage = {
   /**
    * Get summary statistics
    */
-  getStats: async (history: GameRecord[]): Promise<{
+  getStats: (history: GameRecord[]): {
     totalGames: number;
     averageBombs: number;
     bestBombs: number;
     averageTime: number;
     bestTime: number;
-  }> => {
+  } => {
 
     if (history.length === 0) {
       return {
