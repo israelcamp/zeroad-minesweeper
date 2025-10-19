@@ -80,7 +80,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     ndkVersion rootProject.ext.ndkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
     namespace "com.minesweeper"

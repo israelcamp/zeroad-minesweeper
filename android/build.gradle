@@ -1,21 +1,16 @@
 buildscript {
-    ext {
-        buildToolsVersion = "35.0.0"
-        minSdkVersion = 24
-        compileSdkVersion = 35
-        targetSdkVersion = 35
-        ndkVersion = "27.1.12297006"
-        kotlinVersion = "2.0.21"
-    }
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath("com.android.tools.build:gradle:8.7.0")
-        classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
-    }
+  ext {
+    // remove buildToolsVersion here; AGP will choose correctly
+    minSdkVersion = 24
+    compileSdkVersion = 35
+    targetSdkVersion = 35
+    ndkVersion = "29.0.14206865" // or keep 27.1.* with flags, see below
+    kotlinVersion = "2.0.21"
+  }
+  repositories { google(); mavenCentral() }
+  dependencies {
+    classpath("com.android.tools.build:gradle:8.12.2") // ✅ compatible with Gradle 8.13
+    classpath("com.facebook.react:react-native-gradle-plugin")
+    classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+  }
 }
-
-apply plugin: "com.facebook.react.rootproject"
