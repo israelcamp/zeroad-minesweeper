@@ -87,8 +87,8 @@ android {
         applicationId "com.appisnotnone.minesweeper"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "2.0.1"
+        versionCode 12
+        versionName "2.0.2"
     }
     signingConfigs {
         release {
@@ -121,6 +121,15 @@ android {
         jniLibs {
             useLegacyPackaging = false
         }
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'com.google.android.material:material:1.12.0'
+        force 'androidx.core:core-ktx:1.13.1'
+        force 'androidx.activity:activity:1.9.3'
+        force 'androidx.appcompat:appcompat:1.7.0'
     }
 }
 
